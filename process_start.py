@@ -4,7 +4,7 @@ import numpy as np
 import shutil
 from id_parser import parse_pearl_id_and_view
 from segmentation import process_images
-
+from config_manager import config_context
 
 MERGE = False
 
@@ -35,7 +35,6 @@ for filename in os.listdir(UPLOAD_FOLDER):
 
 
 output_folder = 'processed_pearl_output'
-#output_folder = 'processed_scale_output'
 
 if not os.path.exists(output_folder): #  it deletes the folder if it already exists and creates a new one
         os.makedirs(output_folder)
@@ -55,19 +54,22 @@ else:
 
 
 
-
 for pearl_id, views in object_dictionary.items(): 
     processed_images = {}
 
     required_views = [object_dictionary[pearl_id][v] for v in views]
-    processed_images = process_images(required_views, MERGE) # merge is per default false
-    
-    for id, image in processed_images.items():
-        output_path = os.path.join(output_folder, f"{id}.png")
-        cv2.imwrite(output_path, image)
-        print('Saved: ', output_path)
+    main_path = required_views[0]
 
+    try:
+        with config_context(main_path) as config:
+                processed_images = process_images(required_views, config, MERGE) # merge is per default false
 
+                for id, image in processed_images.items():
+                    output_path = os.path.join(output_folder, f"{id}.png")
+                    cv2.imwrite(output_path, image)
+                    print('Saved: ', output_path)
+    except ValueError as e:
+        print(e)
 
 
 print('Done!')
