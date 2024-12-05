@@ -5,11 +5,11 @@ from imutils import perspective
 from scipy.spatial import distance as dist
 
 
-
 def calculate_ppm(image_path, scale_length, configuration,  thr_value = 160):  # im not sure which value to use for the scale tbh
     original_image = cv2.imread(image_path)
     print('in calculate ppm the image_path is:', image_path)
-    threshold_image = enhance_and_threshold(original_image, configuration, thr_value)
+
+    threshold_image = enhance_and_threshold(original_image, configuration, True,  thr_value)
 
     image_h,_ , _ = original_image.shape
 
@@ -27,6 +27,7 @@ def calculate_ppm(image_path, scale_length, configuration,  thr_value = 160):  #
         
     pixel_metric = None
 
+    cv2.imwrite('alll_cnt.jpg', original_image)
     if scale_contour is not None:
         box = cv2.minAreaRect(scale_contour)
         box = cv2.boxPoints(box)
@@ -45,11 +46,12 @@ def calculate_ppm(image_path, scale_length, configuration,  thr_value = 160):  #
         known_scale_length = scale_length # its in mm
 
         pixel_metric = scale_width / known_scale_length  # the width in the image should be irl 5 cm/ 50 mm
-        # pixels_per_metric = object_width / know_width
+        cv2.imwrite('found_bigger_dilate.jpg', threshold_image)
     else:
+        cv2.imwrite('invalid_scale.jpg', threshold_image)
         print('Scale contour was not found: too close to board or in an invalid position.')
 
-    return pixel_metric 
+    return pixel_metric # can return none, careful
 
 def midpoint(ptA, ptB):
     return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)

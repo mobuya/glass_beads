@@ -23,7 +23,7 @@ HOLE_SIMILARITY_TOLERANCE = 10
 
 def find_artifact_contour(image_path, pearl_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE):
     original_image = cv2.imread(image_path)
-    threshold_image = enhance_and_threshold(original_image, configuration, thr_value)
+    threshold_image = enhance_and_threshold(original_image, configuration, False, thr_value)
 
     background_color = get_background_color(original_image)
 

@@ -14,10 +14,6 @@ import os
 import csv
 
 
-path_original = 'size_test/ENZFSCH_333_004_A.png'
-
-org_img = cv2.imread(path_original)
-org_pxl = org_img.shape[0] * org_img.shape[1]
 
 '''
 config lives only now inside this scope, have to use it only there
@@ -25,23 +21,13 @@ config lives only now inside this scope, have to use it only there
 
 maybde its best that for the config_ctx they just take the path, so that when im in porcess start while reading the separate paths i get the value like thaat without opening the file
 '''
-try:
-    with config_context(org_pxl) as config:
-        wA, wb = process_object_size([path_original], config)
-        print(f"The original pearl value for A is: {wA}")
-except ValueError as e:
-    print(e)
-   
 
-path_rsz = 'RESZ_333_004_A.png'
-
-rsz_img = cv2.imread(path_rsz)
-rsz_pxl = rsz_img.shape[0] * rsz_img.shape[1]
+path_rsz = 'size_test/ENZFSCH_333_011_A.png'
 
 try:
-    with config_context(rsz_pxl) as config:
+    with config_context(path_rsz) as config:
         wA, wb = process_object_size([path_rsz], config)
-        print(f"The resized pearl value for A is: {wA}")
+        print(f"The resized pearl value for A is: {wA} and for B: {wb}")
 except ValueError as e:
     print(e)
 
@@ -67,13 +53,5 @@ for id, image in output_resized.items():
 
 for id, image in output_original.items():
     cv2.imwrite('orginal_output.png', image)
-
-'''
-
-
-
-'''
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-I also need to create a little statistic thingy for the end of my calculations, just like what is the average length and width, smallest and biggest
 
 '''

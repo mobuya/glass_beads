@@ -11,11 +11,11 @@ For now per one object, should also be a posibility to loop through a list and c
 '''
 
 
-def place_object_on_background(image_path, outer_contour, inner_contour, transparent = True):   
+def place_object_on_background(image_path, outer_contour, inner_contour, config, transparent = True):   
     original_image = cv2.imread(image_path)
     img_h, img_w, _ = original_image.shape
 
-    thr_img = enhance_and_threshold(original_image, THR_VALUE)  
+    thr_img = enhance_and_threshold(original_image, config, THR_VALUE)  
 
     mask = np.zeros_like(thr_img)
     cv2.drawContours(mask, [outer_contour], -1, 255, thickness=cv2.FILLED)  # look if thickness correct
@@ -24,6 +24,7 @@ def place_object_on_background(image_path, outer_contour, inner_contour, transpa
         cv2.drawContours(mask, [inner_contour], -1, 0, thickness=cv2.FILLED) 
 
     extracted_artifact = cv2.bitwise_and(original_image, original_image, mask=mask)
+    # trying to erode the mask
 
     if transparent is True:
         pearl_on_background = np.zeros((img_h, img_w, 4), dtype=np.uint8)

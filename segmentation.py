@@ -19,7 +19,7 @@ Transparent toggle is here !!!!!!!! ITS AT TRUE THE TRANSPARENT
 
 '''
 
-def process_images(paths, merge = False):
+def process_images(paths, config, merge = False):
     processed_images = {}
     transparent = True
 
@@ -38,7 +38,7 @@ def process_images(paths, merge = False):
             pearl_view = 'A' if "A" in pearl_view else 'B'
             
             artifact_contour, inner_contour = find_artifact_contour(path, pearl_view, config)
-            final_img = place_object_on_background(path, artifact_contour, inner_contour, transparent=transparent)
+            final_img = place_object_on_background(path, artifact_contour, inner_contour, config, transparent=transparent)
             
             processed_images[outputfile] = final_img
             #print('output:', outputfile)
