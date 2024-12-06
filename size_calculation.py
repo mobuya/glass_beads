@@ -1,8 +1,5 @@
 import cv2
 import numpy as np
-from imutils import perspective
-from scipy.spatial import distance as dist
-from pixel_per_metric import midpoint
 
  
 def get_horizontal_dimension(pearl_contour, pixel_metric, configuration):

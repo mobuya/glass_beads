@@ -1,7 +1,5 @@
 import cv2
 import numpy as np
-import constants
-
 
 
 def enhance_and_threshold(image, configuration, dilated = False,  threshold_value = 223):

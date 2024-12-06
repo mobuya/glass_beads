@@ -3,11 +3,12 @@ import numpy as np
 from enhance_threshold import enhance_and_threshold
 from imutils import perspective
 from scipy.spatial import distance as dist
-
+from id_parser import parse_filename_from_path
+ 
 
 def calculate_ppm(image_path, scale_length, configuration,  thr_value = 160):  # im not sure which value to use for the scale tbh
     original_image = cv2.imread(image_path)
-    print('in calculate ppm the image_path is:', image_path)
+    # print('in calculate ppm the image_path is:', image_path)
 
     threshold_image = enhance_and_threshold(original_image, configuration, True,  thr_value)
 
@@ -27,7 +28,7 @@ def calculate_ppm(image_path, scale_length, configuration,  thr_value = 160):  #
         
     pixel_metric = None
 
-    cv2.imwrite('alll_cnt.jpg', original_image)
+    
     if scale_contour is not None:
         box = cv2.minAreaRect(scale_contour)
         box = cv2.boxPoints(box)
@@ -48,7 +49,8 @@ def calculate_ppm(image_path, scale_length, configuration,  thr_value = 160):  #
         pixel_metric = scale_width / known_scale_length  # the width in the image should be irl 5 cm/ 50 mm
         cv2.imwrite('found_bigger_dilate.jpg', threshold_image)
     else:
-        cv2.imwrite('invalid_scale.jpg', threshold_image)
+        pearl_name = parse_filename_from_path(image_path)
+        cv2.imwrite(f"invalid_scale_{pearl_name}.jpg", threshold_image)
         print('Scale contour was not found: too close to board or in an invalid position.')
 
     return pixel_metric # can return none, careful

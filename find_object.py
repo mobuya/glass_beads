@@ -1,8 +1,6 @@
 import cv2
 import numpy as np
 from enhance_threshold import enhance_and_threshold
-from imutils import perspective
-from scipy.spatial import distance as dist
 
 
 '''
@@ -56,7 +54,7 @@ def find_artifact_contour(image_path, pearl_view, configuration, thr_value = THR
                    
                     smallest_cntr = contour
 
-                    print(f"The pearl view is {pearl_view}")
+                   # print(f"The pearl view is {pearl_view}")
                     for sub_index, sub_contour in enumerate(contours):
                         if hierarchy[0][sub_index][3] == idx and pearl_view == 'B':
                             inner_area = cv2.contourArea(sub_contour)
@@ -65,11 +63,11 @@ def find_artifact_contour(image_path, pearl_view, configuration, thr_value = THR
                                 inner_mask = np.zeros(threshold_image.shape, dtype=np.uint8)
                                 cv2.drawContours(inner_mask, [sub_contour], -1, 255, -1)
                                 inner_mean_color = cv2.mean(original_image, mask = inner_mask)[:3]
-                                print(f"The bg color: {background_color}")
-                                print(f"The inner area color: {inner_mean_color}")
+                               # print(f"The bg color: {background_color}")
+                               # print(f"The inner area color: {inner_mean_color}")
                                 if np.allclose(inner_mean_color, background_color, atol = hole_similarity):  # similarity tol changed for 340_139 -> 10 works, for rethresh
                                     inner_contour = sub_contour
-                                    print('found inner contour')
+                                    # print('found inner contour')
                                     break
 
                     break

@@ -25,7 +25,7 @@ PREDEFINDED_CONFIGS = {
         # pixel per metric
         "MIN_SCALE_AREA": 1000000,
         # size prediction
-        "DILATE_ADAPTATION": 0.35
+        "DILATE_ADAPTATION": 0.25
     },
     "min_size": {
         "MORPH_KERNEL_SIZE": np.ones((5, 5), np.uint8),
@@ -38,6 +38,6 @@ PREDEFINDED_CONFIGS = {
         # pixel per metric
         "MIN_SCALE_AREA": 100000,
         # size prediction
-        "DILATE_ADAPTATION": 0.35
+        "DILATE_ADAPTATION": 0.2
     },
 }

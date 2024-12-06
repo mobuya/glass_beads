@@ -9,7 +9,7 @@ def parse_pearl_id_and_view(filename):
 
     return pearl_id, pearl_view
 
-def parse_pearl_id_from_path(filepath):
+def parse_filename_from_path(filepath):
     filename = filepath.split('/')[-1]
     filename = filename.split('.')[0] 
 

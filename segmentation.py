@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from id_parser import parse_pearl_id_from_path
+from id_parser import parse_filename_from_path
 from id_parser import parse_pearl_id_and_view
 from enhance_threshold import enhance_and_threshold
 from find_object import find_artifact_contour
@@ -31,9 +31,9 @@ def process_images(paths, config, merge = False):
         # could also maybe be done with the down same function 
     else:
         for path in paths:
-            outputfile = parse_pearl_id_from_path(path)
+            outputfile = parse_filename_from_path(path)
             
-            print('path is', path)
+           # print('path is', path)
             _, pearl_view = parse_pearl_id_and_view(path)
             pearl_view = 'A' if "A" in pearl_view else 'B'
             
