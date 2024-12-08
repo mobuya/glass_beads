@@ -1,7 +1,7 @@
 ## About the Project
 
 Work in progress for my thesis, consisting of three main parts:
- 1. Bead segmentation: implemented segmenting single pearls, merge function missing
+ 1. Bead segmentation: implemented segmenting pearls with merge and single image; need to implement some optimization
  2. Size prediction: works, but only when scale is valid on that picture, missing handling when scale invalid
  3. Web interface: not yet implemented
 
@@ -9,7 +9,7 @@ Work in progress for my thesis, consisting of three main parts:
 1. Segmentation:
      - ```enhance_threshold.py``` creates binary threshold image
      - ```find_object.py``` finds bead contour
-     - ```place_object.py``` places object on transparent backgorund
+     - ```place_object.py``` places object(s) on transparent or white background
      - ```segmentation.py``` combined the above functions, reads throug image paths to process multiple images at once
 2. Size prediction:
    - ```pixel_per_metric.py``` calculates the pixel per metric based on the scale, uses threshold function from above too
@@ -24,7 +24,6 @@ Helpers:
 The ```process_start.py``` file combines the current progress of segmentation and size prediction, used for smoke tests to see current functionality.
 
 Missing:
-  - merging multiple views on one image
   - resolving the invalid scale problem
   - optimization with mask rescaling
   - unit test
