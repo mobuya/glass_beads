@@ -3,41 +3,64 @@ import numpy as np
 from enhance_threshold import enhance_and_threshold
 from find_object import THR_VALUE
 
-'''
-Background transparent per default, if changed it is white 
-
-For now per one object, should also be a posibility to loop through a list and combine many at once
-
-'''
 
 
-def place_object_on_background(image_path, outer_contour, inner_contour, config, transparent = True):   
-    original_image = cv2.imread(image_path)
-    img_h, img_w, _ = original_image.shape
+def place_obj_on_background(img_paths, out_contours, in_contours, transparent, config):
+    print('inside the merge')
 
-    thr_img = enhance_and_threshold(original_image, config, THR_VALUE)  
+    if len(img_paths) != len(out_contours):
+        print('paths and contours dont match!')
+        return
+    
+    if len(img_paths) != len(in_contours):
+        print('paths and inner contours dont match!')  # some of the inner ones are none, not really good practice but helpful here
+        return
 
-    mask = np.zeros_like(thr_img)
-    cv2.drawContours(mask, [outer_contour], -1, 255, thickness=cv2.FILLED)  # look if thickness correct
 
-    if inner_contour is not None:
-        cv2.drawContours(mask, [inner_contour], -1, 0, thickness=cv2.FILLED) 
+    images = [cv2.imread(path) for path in img_paths]
+    object_sizes = [(cv2.boundingRect(c)[2], cv2.boundingRect(c)[3]) for c in out_contours]
+    object_heights = [cv2.boundingRect(c)[3] for c in out_contours]
+    object_widths = [cv2.boundingRect(c)[2] for c in out_contours]
 
-    extracted_artifact = cv2.bitwise_and(original_image, original_image, mask=mask)
-    # trying to erode the mask
+    H_PADDING = config["IMG_H_PADDING"]   # MOVE TO CONSTANTS LATER !!!!!!!!!!!
+    WDTH_PADDING = 200  # THIS TOOO !!!!!!!! 
+    canvas_width = sum(object_widths) + (len(object_widths) - 1) * H_PADDING + 2 * WDTH_PADDING
+    canvas_height = max(object_heights) + H_PADDING
 
-    if transparent is True:
-        pearl_on_background = np.zeros((img_h, img_w, 4), dtype=np.uint8)
-        pearl_on_background[..., :3] = extracted_artifact
-        pearl_on_background[..., 3] = mask
+    if transparent:
+        canvas = np.zeros((canvas_height, canvas_width, 4), dtype=np.uint8)  # RGBA for transparency
     else:
-         pearl_on_background = np.ones_like(original_image) * 255
-         x, y, w, h = cv2.boundingRect(outer_contour)
-         
-         roi = pearl_on_background[y:y+h, x:x+w]
-         mask_cropped = mask[y:y+h, x:x+w]
-         object_cropped = extracted_artifact[y:y+h, x:x+w]
-         
-         roi[mask_cropped > 0] = object_cropped[mask_cropped > 0]
+        canvas = np.ones((canvas_height, canvas_width, 3), dtype=np.uint8) * 255  # White background
 
-    return pearl_on_background
+    
+    current_x = WDTH_PADDING
+    for img, contour, inner_contour, (w, h) in zip(images, out_contours, in_contours, object_sizes):
+        # no config
+        mask = np.zeros(img.shape[:2], dtype=np.uint8)
+        cv2.drawContours(mask, [contour], -1, 255, thickness=cv2.FILLED)
+
+        if inner_contour is not None:
+            cv2.drawContours(mask, [inner_contour], -1, 0, thickness=cv2.FILLED) 
+        extracted_artifact = cv2.bitwise_and(img, img, mask=mask)
+
+        # part from old code 
+        x, y, w, h = cv2.boundingRect(contour)
+        roi = extracted_artifact[y:y+h, x:x+w]
+        cropped_mask = mask[y:y+h, x:x+w]
+
+        if transparent:
+            artifact = np.zeros((h, w, 4), dtype=np.uint8)
+            artifact[..., :3] = roi
+            artifact[..., 3] = cropped_mask
+        else:
+            artifact = np.ones((h, w, 3), dtype=np.uint8) * 255
+            artifact[cropped_mask > 0] = roi[cropped_mask > 0]
+        
+        h_offset = (canvas_height - h) // 2  # test 
+        canvas[h_offset:h_offset + h, current_x:current_x + w] = artifact
+
+        current_x += w + H_PADDING
+
+    print('finished merging')
+
+    return canvas
