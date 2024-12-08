@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 from enhance_threshold import enhance_and_threshold
-
+from color_extraction import get_dominant_color
 
 '''
 WARNING:
@@ -19,7 +19,7 @@ THR_VALUE = 223
 BACKGROUND_SIMILARITY_TOLERANCE = 25
 HOLE_SIMILARITY_TOLERANCE = 10  
 
-def find_artifact_contour(image_path, pearl_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE):
+def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE):
     original_image = cv2.imread(image_path)
     threshold_image = enhance_and_threshold(original_image, configuration, False, thr_value)
 
@@ -79,11 +79,15 @@ def find_artifact_contour(image_path, pearl_view, configuration, thr_value = THR
         if thr_value != 160:
             THR_VALUE = 160
             NEW_HOLE_SIMILARITY_TOLERANCE = 25
-            return find_artifact_contour(image_path, pearl_view,configuration, 160, NEW_HOLE_SIMILARITY_TOLERANCE) # add logging for the change of the value
+            return find_artifact_contour_and_color(image_path, pearl_view,configuration, 160, NEW_HOLE_SIMILARITY_TOLERANCE) # add logging for the change of the value
 
         print('it cant find anything lol') # ERROR HANDLING HERE: means image is not adaptable for threshold
- 
-    return smallest_cntr, inner_contour
+    
+    original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+    dominant_colors = get_dominant_color(original_image, smallest_cntr)
+    main_color = dominant_colors[0]
+
+    return smallest_cntr, inner_contour, main_color
     
 
 def get_background_color(image):
