@@ -14,6 +14,7 @@ ALLOWED_FILE_TYPES = ('.jpg', '.jpeg', '.png')
 CSV_FILE = 'pearl_dimensions.csv'
 
 MERGE = False
+TRANSPARENT = True
 
 object_dictionary = {}
 
@@ -21,6 +22,8 @@ object_dictionary = {}
 Maybe size prediction is not always needed !!!!! i think it is, should ask Lukas about it
 The folder maybe shouldnt be delete if it already exists: maybe append the date and time to the results folder
 
+I can make a loop that looks for a valid scale, and when it finds a valid scale, it then starts predicting, for images where the scale is visible save that value as helper_scale_value 
+so when it again gets to a scale thats not readable it takes that previous value
 
 '''
 
@@ -69,8 +72,9 @@ for pearl_id, views in object_dictionary.items():
 
     try:
         with config_context(main_path) as config:
-                processed_images = process_images(required_views, config, MERGE) # merge is per default false
-                wA, wB = process_object_size(required_views, config)
+                processed_images = process_images(required_views, config, MERGE, TRANSPARENT) # merge is per default false
+                wA, wB = [0, 0] # process_object_size(required_views, config)
+
                 for id, image in processed_images.items():
                     output_path = os.path.join(OUTPUT_FOLDER, f"{id}.png")
                     cv2.imwrite(output_path, image)

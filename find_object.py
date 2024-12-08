@@ -67,7 +67,7 @@ def find_artifact_contour(image_path, pearl_view, configuration, thr_value = THR
                                # print(f"The inner area color: {inner_mean_color}")
                                 if np.allclose(inner_mean_color, background_color, atol = hole_similarity):  # similarity tol changed for 340_139 -> 10 works, for rethresh
                                     inner_contour = sub_contour
-                                    # print('found inner contour')
+                                    # print('---> found inner contour, and the len is:', len(inner_contour))
                                     break
 
                     break
