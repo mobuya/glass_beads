@@ -4,7 +4,7 @@ import shutil
 from id_parser import parse_pearl_id_and_view
 from segmentation import process_images
 from config_manager import config_context
-from prediction import process_object_size
+from prediction import process_object_size_color
 import csv
 
 
@@ -14,7 +14,7 @@ ALLOWED_FILE_TYPES = ('.jpg', '.jpeg', '.png')
 CSV_FILE = 'pearl_dimensions.csv'
 
 MERGE = False
-TRANSPARENT = True
+TRANSPARENT = False
 
 object_dictionary = {}
 
@@ -73,8 +73,9 @@ for pearl_id, views in object_dictionary.items():
     try:
         with config_context(main_path) as config:
                 processed_images = process_images(required_views, config, MERGE, TRANSPARENT) # merge is per default false
-                wA, wB = [0, 0] # process_object_size(required_views, config)
+                wA, wB, mean_color = process_object_size_color(required_views, config)
 
+                print(f"---> Mean color for pearl {pearl_id} is {mean_color}")
                 for id, image in processed_images.items():
                     output_path = os.path.join(OUTPUT_FOLDER, f"{id}.png")
                     cv2.imwrite(output_path, image)

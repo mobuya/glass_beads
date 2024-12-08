@@ -22,8 +22,8 @@ def place_obj_on_background(img_paths, out_contours, in_contours, transparent, c
     object_heights = [cv2.boundingRect(c)[3] for c in out_contours]
     object_widths = [cv2.boundingRect(c)[2] for c in out_contours]
 
-    H_PADDING = config["IMG_H_PADDING"]   # MOVE TO CONSTANTS LATER !!!!!!!!!!!
-    WDTH_PADDING = 200  # THIS TOOO !!!!!!!! 
+    H_PADDING = config["IMG_H_PADDING"]   
+    WDTH_PADDING = config["IMG_W_PADDING"]  
     canvas_width = sum(object_widths) + (len(object_widths) - 1) * H_PADDING + 2 * WDTH_PADDING
     canvas_height = max(object_heights) + H_PADDING
 
