@@ -3,17 +3,6 @@ import numpy as np
 from enhance_threshold import enhance_and_threshold
 from color_extraction import get_dominant_color
 
-'''
-WARNING:
-For now i am using fixed values, these will be adapted when i get the info from Benny what are the iamge resolutions they usually have.
-
-Adapt fixed values!!
-
-
-CURRENT FIXED VALUES:
-min area of smallest contour and min area for inner contour
-!!!
-'''
 
 THR_VALUE = 223
 BACKGROUND_SIMILARITY_TOLERANCE = 25
@@ -83,9 +72,11 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
 
         print('it cant find anything lol') # ERROR HANDLING HERE: means image is not adaptable for threshold
     
-    original_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+    # ****************** COLOR EXTRACTION ******************
+
     dominant_colors = get_dominant_color(original_image, smallest_cntr)
-    main_color = dominant_colors[0]
+    main_color = np.mean(dominant_colors, axis=0).astype(np.uint8)   # returns 3 colors, take the mean of those as like the general color, but i dont like how this works
+    #main_color = dominant_colors[0]
 
     return smallest_cntr, inner_contour, main_color
     
