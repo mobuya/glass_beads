@@ -44,7 +44,6 @@ def process_object_size_color(paths, configuration):
     final_object_length = sum(length_viewA) / len(length_viewA) if length_viewA else 0.0
     final_object_width = sum(width_viewB) / len(width_viewB) if width_viewB else 0.0
 
-   # mean_dominant_color = np.mean(colors, axis=0).astype(np.uint8)
     # return just the first color for now, its sorted so its from view A (no hole): could add in find obj that it saves the color only if its view A 
 
     return round(final_object_length, 1), round(final_object_width, 1), colors[0]

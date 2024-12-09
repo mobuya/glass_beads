@@ -5,16 +5,18 @@ from id_parser import parse_pearl_id_and_view
 from segmentation import process_images
 from config_manager import config_context
 from prediction import process_object_size_color
-import csv
+from openpyxl import Workbook
+from openpyxl.styles import PatternFill
 
 
 UPLOAD_FOLDER = 'combine_all/' 
 OUTPUT_FOLDER = 'processed_pearl_output'
 ALLOWED_FILE_TYPES = ('.jpg', '.jpeg', '.png')
-CSV_FILE = 'pearl_dimensions.csv'
 
-MERGE = False
-TRANSPARENT = False
+XLSX_FILE = 'pearl_data_color.xlsx'
+
+MERGE = True
+TRANSPARENT = True
 
 object_dictionary = {}
 
@@ -57,25 +59,23 @@ else:
      for v in views:
           print('View', v,':', object_dictionary[pearl_id][v])'''
 
-csv_header = ['pearl_id', 'length', 'width']
-if not os.path.exists(CSV_FILE):
-     with open(CSV_FILE, mode='w', newline='') as file:
-          writer = csv.writer(file, delimiter = ';')
-          writer.writerow(csv_header)
-
+workbook = Workbook()
+sheet = workbook.active
+sheet.title = "Pearl Data"
+sheet.append(['Pearl_ID', 'Length', 'Width', 'Color'])
 
 for pearl_id, views in object_dictionary.items(): 
     processed_images = {}
 
     required_views = [object_dictionary[pearl_id][v] for v in views]
-    main_path = required_views[0]
+    main_path = required_views[0]  # the first picture determines the configuration !!! 
 
     try:
         with config_context(main_path) as config:
+                # should add here the scale determination, should also ask lukas maybe what he thinks about my idea
                 processed_images = process_images(required_views, config, MERGE, TRANSPARENT) # merge is per default false
                 wA, wB, mean_color = process_object_size_color(required_views, config)
 
-                print(f"---> Mean color for pearl {pearl_id} is {mean_color}")
                 for id, image in processed_images.items():
                     output_path = os.path.join(OUTPUT_FOLDER, f"{id}.png")
                     cv2.imwrite(output_path, image)
@@ -83,13 +83,18 @@ for pearl_id, views in object_dictionary.items():
 
                 wA_str = f"{wA:.2f}".replace('.', ',')
                 wB_str = f"{wB:.2f}".replace('.', ',')
-                # add color determination: simple function
-                with open(CSV_FILE, mode='a', newline='') as file:
-                     writer = csv.writer(file, delimiter = ';')
-                     writer.writerow([pearl_id, wA_str, wB_str])
-                     print(f"Saved dimensions for {pearl_id}")
+
+                rgb_color = f"RGB: ({mean_color[0]}, {mean_color[1]}, {mean_color[2]})"
+                row = [pearl_id, wA_str, wB_str, rgb_color]
+                sheet.append(row)
+
+                color_hex = f"{mean_color[0]:02X}{mean_color[1]:02X}{mean_color[2]:02X}"
+                color_fill = PatternFill(start_color=color_hex, end_color=color_hex, fill_type="solid")
+                sheet[f"D{sheet.max_row}"].fill = color_fill
+
+                print(f"Saved data for {pearl_id}")
     except ValueError as e:
         print(e)
 
-
+workbook.save(XLSX_FILE)
 print('Done!')

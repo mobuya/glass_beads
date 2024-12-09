@@ -11,10 +11,11 @@ from color_extraction import get_dominant_color
 
 #path = "ENZFSCH_333_009_A.png"
 #path = "ENZFSCH_333_027_A.png"
-path = "ENZFSCH_340_007_B1.png"
+#path = "ENZFSCH_340_007_B1.png"
 #path = "ENZFSCH_333_001_B2.png"
 #path = "ENZFSCH_333_010_A.png"
 
+path = "combine_all/ENZFSCH_333_010_B2.png"
 img = cv2.imread(path)
 
 
@@ -35,11 +36,12 @@ def plot_img_with_colors(img, colors):
         ax[c_i+1].set_title(f"Color #{c_i+1}")
     plt.show()
 
-path_temp = "combine_all/ENZFSCH_333_010_B1.png"
 
 try:
-    with config_context(path_temp) as config:
+    with config_context(path) as config:
         out_cnt, _, main_clr = find_artifact_contour_and_color(path, 'X', config)
-        plot_img_with_colors(img, np.array([main_clr]))
+        dom_cols = get_dominant_color(img, out_cnt)
+        plot_img_with_colors(img, np.array(dom_cols))
+        #plot_img_with_colors(img, np.array([main_clr]))
 except ValueError as e:
         print(e) 
