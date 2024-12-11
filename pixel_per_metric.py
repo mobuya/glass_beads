@@ -47,7 +47,7 @@ def calculate_ppm(image_path, scale_length, configuration,  thr_value = 160):  #
         known_scale_length = scale_length # its in mm
 
         pixel_metric = scale_width / known_scale_length  # the width in the image should be irl 5 cm/ 50 mm
-        cv2.imwrite('found_bigger_dilate.jpg', threshold_image)
+        #cv2.imwrite('found_bigger_dilate.jpg', threshold_image)
     else:
         pearl_name = parse_filename_from_path(image_path)
         cv2.imwrite(f"invalid_scale_{pearl_name}.jpg", threshold_image)

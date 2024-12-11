@@ -6,9 +6,6 @@ from config_manager import config_context
 from color_extraction import get_dominant_color
 
 
-
-
-
 #path = "ENZFSCH_333_009_A.png"
 #path = "ENZFSCH_333_027_A.png"
 #path = "ENZFSCH_340_007_B1.png"
@@ -41,7 +38,7 @@ try:
     with config_context(path) as config:
         out_cnt, _, main_clr = find_artifact_contour_and_color(path, 'X', config)
         dom_cols = get_dominant_color(img, out_cnt)
-        plot_img_with_colors(img, np.array(dom_cols))
-        #plot_img_with_colors(img, np.array([main_clr]))
+        #plot_img_with_colors(img, np.array(dom_cols))
+        plot_img_with_colors(img, np.array([main_clr]))
 except ValueError as e:
         print(e) 

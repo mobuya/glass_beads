@@ -4,6 +4,12 @@ from enhance_threshold import enhance_and_threshold
 from find_object import THR_VALUE
 
 
+'''
+
+do i need to cite this: https://stackoverflow.com/questions/56604151/how-to-extract-multiple-objects-from-an-image-using-python-opencv ?????
+
+'''
+
 
 def place_obj_on_background(img_paths, out_contours, in_contours, transparent, config):
     print('inside the merge')

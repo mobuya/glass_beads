@@ -8,9 +8,9 @@ def config_context(path):
     image_pixels = img.shape[0] * img.shape[1]
 
     if image_pixels > 35000000:
-        config = constants.PREDEFINDED_CONFIGS["max_size"]
+        config = constants.PREDEFINED_CONFIGS["max_size"]
     elif image_pixels > 20000000:
-        config = constants.PREDEFINDED_CONFIGS["min_size"]
+        config = constants.PREDEFINED_CONFIGS["min_size"]
     else:
         raise ValueError("Invalid image size!")
 

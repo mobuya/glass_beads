@@ -13,7 +13,7 @@ this has to be tested with different sizes, minimum is 6000 x 6000
 
 CONFIGURATION = None
 
-PREDEFINDED_CONFIGS = {
+PREDEFINED_CONFIGS = {
     "max_size": {
         "MORPH_KERNEL_SIZE": np.ones((5, 5), np.uint8),
         "MORPH_ITERATIONS": 6,

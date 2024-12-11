@@ -18,7 +18,7 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
 
     contours, hierarchy = cv2.findContours(threshold_image, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
    
-    smallest_cntr = None
+    smallest_contr = None
     inner_contour = None
 
     MIN_AREA = configuration["MIN_AREA"] 
@@ -30,7 +30,7 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
         area = cv2.contourArea(contour)
         if hierarchy[0][idx][3] == -1:  #  just look at outer contours
             if area >= MIN_AREA:
-                x, y, w, h = cv2.boundingRect(contour)
+                x, y, _, _ = cv2.boundingRect(contour)
                 if y < (image_h * 0.8) and x < (image_w * 0.5) and area < area_limit:  # check position and area size
 
                     mask = np.zeros(threshold_image.shape, dtype=np.uint8)
@@ -40,10 +40,8 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
                     if np.allclose(mean_color, background_color, atol=BACKGROUND_SIMILARITY_TOLERANCE):
                         continue  
                     
-                   
-                    smallest_cntr = contour
+                    smallest_contr = contour
 
-                   # print(f"The pearl view is {pearl_view}")
                     for sub_index, sub_contour in enumerate(contours):
                         if hierarchy[0][sub_index][3] == idx and pearl_view == 'B':
                             inner_area = cv2.contourArea(sub_contour)
@@ -52,18 +50,16 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
                                 inner_mask = np.zeros(threshold_image.shape, dtype=np.uint8)
                                 cv2.drawContours(inner_mask, [sub_contour], -1, 255, -1)
                                 inner_mean_color = cv2.mean(original_image, mask = inner_mask)[:3]
-                               # print(f"The bg color: {background_color}")
-                               # print(f"The inner area color: {inner_mean_color}")
+
                                 if np.allclose(inner_mean_color, background_color, atol = hole_similarity):  # similarity tol changed for 340_139 -> 10 works, for rethresh
                                     inner_contour = sub_contour
-                                    # print('---> found inner contour, and the len is:', len(inner_contour))
                                     break
 
                     break
 
 
-    if smallest_cntr is not None:
-        print('Artifaqct contour found.')
+    if smallest_contr is not None:
+        print('Artifact contour found.')
     else:
         if thr_value != 160:
             THR_VALUE = 160
@@ -73,12 +69,13 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
         print('it cant find anything lol') # ERROR HANDLING HERE: means image is not adaptable for threshold
     
     # ****************** COLOR EXTRACTION ******************
+    '''
+    Color extraction is places here because of optimization issues !!!
+    '''
 
-    dominant_colors = get_dominant_color(original_image, smallest_cntr)
-    main_color = np.mean(dominant_colors, axis=0).astype(np.uint8)   # returns 3 colors, take the mean of those as like the general color, but i dont like how this works
-    #main_color = dominant_colors[0]
-
-    return smallest_cntr, inner_contour, main_color
+    dominant_color = get_dominant_color(original_image, smallest_contr)
+        
+    return smallest_contr, inner_contour, dominant_color
     
 
 def get_background_color(image):
