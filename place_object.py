@@ -12,7 +12,6 @@ do i need to cite this: https://stackoverflow.com/questions/56604151/how-to-extr
 
 
 def place_obj_on_background(img_paths, out_contours, in_contours, transparent, config):
-    print('inside the merge')
 
     if len(img_paths) != len(out_contours):
         print('paths and contours dont match!')
@@ -42,6 +41,7 @@ def place_obj_on_background(img_paths, out_contours, in_contours, transparent, c
     current_x = WDTH_PADDING
     for img, contour, inner_contour, (w, h) in zip(images, out_contours, in_contours, object_sizes):
         # no config
+
         mask = np.zeros(img.shape[:2], dtype=np.uint8)
         cv2.drawContours(mask, [contour], -1, 255, thickness=cv2.FILLED)
 
@@ -66,7 +66,5 @@ def place_obj_on_background(img_paths, out_contours, in_contours, transparent, c
         canvas[h_offset:h_offset + h, current_x:current_x + w] = artifact
 
         current_x += w + H_PADDING
-
-    print('finished merging')
 
     return canvas
