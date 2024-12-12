@@ -11,6 +11,7 @@ HOLE_SIMILARITY_TOLERANCE = 10
 def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE):
     original_image = cv2.imread(image_path)
     threshold_image = enhance_and_threshold(original_image, configuration, False, thr_value)
+    dominant_color = None
 
     background_color = get_background_color(original_image)
 
@@ -66,14 +67,14 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
             NEW_HOLE_SIMILARITY_TOLERANCE = 25
             return find_artifact_contour_and_color(image_path, pearl_view,configuration, 160, NEW_HOLE_SIMILARITY_TOLERANCE) # add logging for the change of the value
 
-        print('it cant find anything lol') # ERROR HANDLING HERE: means image is not adaptable for threshold
+         # ERROR HANDLING HERE: means image is not adaptable for threshold
     
     # ****************** COLOR EXTRACTION ******************
     '''
     Color extraction is places here because of optimization issues !!!
     '''
-
-    dominant_color = get_dominant_color(original_image, smallest_contr)
+    if smallest_contr is not None:
+        dominant_color = get_dominant_color(original_image, smallest_contr)
         
     return smallest_contr, inner_contour, dominant_color
     

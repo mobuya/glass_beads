@@ -14,6 +14,10 @@ File: colors-glassbeads-clustering.ipynb
 
 def get_dominant_color(img, contour, nr_colors=3, nr_iter=10, eps=10):  
 
+    if contour is None:
+        print('No contour found: contour function could not be called.')
+        return None  # this is really unsafe, need to think of better error handling 
+
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     mask = np.zeros(img.shape[:2], dtype=np.uint8)
     cv2.drawContours(mask, [contour], -1, (255), thickness=cv2.FILLED)
