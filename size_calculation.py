@@ -9,7 +9,6 @@ def get_horizontal_dimension(pearl_contour, pixel_metric, configuration):
         print('No valid contour found for size prediction.')
         return 0.0
 
-   
     _, _, w, _ = cv2.boundingRect(pearl_contour)
     
     measured_width = w / pixel_metric  
