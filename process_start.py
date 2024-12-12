@@ -1,6 +1,7 @@
 import os
 import cv2
 import shutil
+import numpy as np
 from datetime import datetime
 from id_parser import parse_pearl_id_and_view
 from config_manager import config_context
@@ -18,7 +19,7 @@ ALLOWED_FILE_TYPES = ('.jpg', '.jpeg', '.png')
 
 XLSX_FILE = 'pearl_data_color.xlsx'
 
-MERGE = False
+MERGE = True
 TRANSPARENT = False
 
 object_dictionary = {}
@@ -69,7 +70,8 @@ for pearl_id, views in object_dictionary.items():
     try:
         with config_context(main_path) as config:
                 processed_images, obj_len, obj_width, colors = crop_artifact_and_measure(required_views, config, MERGE, TRANSPARENT)
-
+                rgb_values = []
+                cell_fills = []
                 for id, image in processed_images.items():
                     output_path = os.path.join(OUTPUT_FOLDER, f"{id}.png")
                     cv2.imwrite(output_path, image)
@@ -78,10 +80,15 @@ for pearl_id, views in object_dictionary.items():
                 wA_str = f"{obj_len:.2f}".replace('.', ',')
                 wB_str = f"{obj_width:.2f}".replace('.', ',')
 
-                rgb_values, cell_fills = convert_for_xlsx(colors)
+                if colors is not None:
+                    rgb_values, cell_fills = convert_for_xlsx(colors)
+                else:
+                    rgb_values = ["(X, X, X)", "(X, X, X)", "(X, X, X)"]  # Use a plain list
+                    white_fill = PatternFill(start_color='FFFFFFFF', end_color='FFFFFFFF', fill_type="solid")
+                    cell_fills = [white_fill, white_fill, white_fill]  # Use a plain list
 
-                row = [pearl_id, wA_str, wB_str, ' ', rgb_values[0],' ',rgb_values[1],' ', rgb_values[2]]
-                
+
+                row = [pearl_id, wA_str, wB_str, ' ', rgb_values[0], ' ', rgb_values[1], ' ', rgb_values[2]]
                 sheet.append(row)
                 row_index = sheet.max_row
                 
