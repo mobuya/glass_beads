@@ -8,8 +8,8 @@ from find_object import get_background_color
 
 template_path = "fitted_color_palette.png"
 
-def calculate_ppm(image_path, scale_length, configuration,  thr_value = 160):  # im not sure which value to use for the scale tbh
-    original_image = cv2.imread(image_path)
+def calculate_ppm(original_image, scale_length, configuration,  thr_value = 160):  # im not sure which value to use for the scale tbh
+    #original_image = cv2.imread(image_path)
 
     threshold_image = enhance_and_threshold(original_image, configuration, True,  thr_value)
 

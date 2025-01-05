@@ -11,18 +11,18 @@ do i need to cite this: https://stackoverflow.com/questions/56604151/how-to-extr
 '''
 
 
-def place_obj_on_background(img_paths, out_contours, in_contours, transparent, config):
+def place_obj_on_background(images, out_contours, in_contours, transparent, config):
 
-    if len(img_paths) != len(out_contours):
+    if len(images) != len(out_contours):
         print('paths and contours dont match!')
         return
     
-    if len(img_paths) != len(in_contours):
+    if len(images) != len(in_contours):
         print('paths and inner contours dont match!')  # some of the inner ones are none, not really good practice but helpful here
         return
 
 
-    images = [cv2.imread(path) for path in img_paths]
+    #images = [cv2.imread(path) for path in img_paths]
     object_sizes = [(cv2.boundingRect(c)[2], cv2.boundingRect(c)[3]) for c in out_contours]
     object_heights = [cv2.boundingRect(c)[3] for c in out_contours]
     object_widths = [cv2.boundingRect(c)[2] for c in out_contours]

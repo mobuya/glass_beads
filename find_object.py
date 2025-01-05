@@ -8,8 +8,8 @@ THR_VALUE = 223 # ***********
 BACKGROUND_SIMILARITY_TOLERANCE = 25
 HOLE_SIMILARITY_TOLERANCE = 10  
 
-def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE):
-    original_image = cv2.imread(image_path)
+def find_artifact_contour_and_color(original_image, pearl_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE):
+    #original_image = cv2.imread(image_path)
     threshold_image = enhance_and_threshold(original_image, configuration, False, thr_value)
     dominant_color = None
 
@@ -42,7 +42,7 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
                         continue  
 
                     if np.allclose(mean_color, background_color, atol=60):
-                        print(f"This one is with a tolerance 60 similar to the background: {image_path}")
+                        print(f"This one is with a tolerance 60 similar to the background:")
                     
                     smallest_contr = contour
 
@@ -68,7 +68,7 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
         if thr_value != 160:
             THR_VALUE = 160
             NEW_HOLE_SIMILARITY_TOLERANCE = 25 # im not sure why i put a new similarity tolerance, have to check this 
-            return find_artifact_contour_and_color(image_path, pearl_view,configuration, 160, NEW_HOLE_SIMILARITY_TOLERANCE) # add logging for the change of the value
+            return find_artifact_contour_and_color(original_image, pearl_view,configuration, 160, NEW_HOLE_SIMILARITY_TOLERANCE) # add logging for the change of the value
 
          # ERROR HANDLING HERE: means image is not adaptable for threshold
     
