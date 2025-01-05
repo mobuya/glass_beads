@@ -19,8 +19,8 @@ ALLOWED_FILE_TYPES = ('.jpg', '.jpeg', '.png')
 
 XLSX_FILE = 'pearl_data_color.xlsx'
 
-MERGE = True
-TRANSPARENT = False
+MERGE = False
+TRANSPARENT = True
 
 object_dictionary = {}
 

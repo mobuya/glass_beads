@@ -33,9 +33,9 @@ def crop_artifact_and_measure(paths, config, merge, transparent):
             if artifact_contour is None:
                 img_paths.remove(path)
                 '''
-                ********************* Here i need some logging like this image was not valid for merging thus it was skipped
+                ********************* Here also logging like this contour was not found thus it was skipped, save to a log or smth
                 '''
-                print('For image no artifact was found; thus cant segment nor predict size')
+                print(f"For image no artifact was found; thus cant segment nor predict size: {path}")
                 continue
 
             out_contours.append(artifact_contour) 
@@ -65,8 +65,8 @@ def crop_artifact_and_measure(paths, config, merge, transparent):
             print(f"For pearl {pearl_view}")
 
             if artifact_contour is None:
-                # ************* Here also logging like this contour was not found thus it was skipped
-                print('For image no artifact was found; thus cant segment nor predict size')
+                # ************* Here also logging like this contour was not found thus it was skipped, save to a log or smth
+                print(f"For image no artifact was found; thus cant segment nor predict size: {path}")
                 continue
         
             object_width = get_horizontal_dimension(artifact_contour, ppm, config) 

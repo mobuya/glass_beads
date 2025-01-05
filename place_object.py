@@ -46,9 +46,9 @@ def place_obj_on_background(img_paths, out_contours, in_contours, transparent, c
         cv2.drawContours(mask, [contour], -1, 255, thickness=cv2.FILLED)
 
         if inner_contour is not None:
-            cv2.drawContours(mask, [inner_contour], -1, 0, thickness=cv2.FILLED) 
+            cv2.drawContours(mask, [inner_contour], -1, 0, thickness=cv2.FILLED)
         extracted_artifact = cv2.bitwise_and(img, img, mask=mask)
-
+        
         # part from old code 
         x, y, w, h = cv2.boundingRect(contour)
         roi = extracted_artifact[y:y+h, x:x+w]

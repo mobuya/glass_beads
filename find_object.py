@@ -4,7 +4,7 @@ from enhance_threshold import enhance_and_threshold
 from color_extraction import get_dominant_color
 
 
-THR_VALUE = 223
+THR_VALUE = 223 # *********** 
 BACKGROUND_SIMILARITY_TOLERANCE = 25
 HOLE_SIMILARITY_TOLERANCE = 10  
 
@@ -40,6 +40,9 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
                     
                     if np.allclose(mean_color, background_color, atol=BACKGROUND_SIMILARITY_TOLERANCE):
                         continue  
+
+                    if np.allclose(mean_color, background_color, atol=60):
+                        print(f"This one is with a tolerance 60 similar to the background: {image_path}")
                     
                     smallest_contr = contour
 
@@ -64,14 +67,14 @@ def find_artifact_contour_and_color(image_path, pearl_view, configuration, thr_v
     else:
         if thr_value != 160:
             THR_VALUE = 160
-            NEW_HOLE_SIMILARITY_TOLERANCE = 25
+            NEW_HOLE_SIMILARITY_TOLERANCE = 25 # im not sure why i put a new similarity tolerance, have to check this 
             return find_artifact_contour_and_color(image_path, pearl_view,configuration, 160, NEW_HOLE_SIMILARITY_TOLERANCE) # add logging for the change of the value
 
          # ERROR HANDLING HERE: means image is not adaptable for threshold
     
     # ****************** COLOR EXTRACTION ******************
     '''
-    Color extraction is places here because of optimization issues !!!
+    Color extraction is placed here because of optimization issues !!!
     '''
     if smallest_contr is not None:
         dominant_color = get_dominant_color(original_image, smallest_contr)
