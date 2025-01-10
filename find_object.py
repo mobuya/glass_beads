@@ -8,9 +8,10 @@ THR_VALUE = 223 # ***********
 BACKGROUND_SIMILARITY_TOLERANCE = 25
 HOLE_SIMILARITY_TOLERANCE = 10  
 
-def find_artifact_contour_and_color(original_image, pearl_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE):
-    #original_image = cv2.imread(image_path)
-    threshold_image = enhance_and_threshold(original_image, configuration, False, thr_value)
+def find_artifact_contour_and_color(original_image, bead_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE, clahe = False):
+
+    threshold_image = enhance_and_threshold(original_image, configuration, False, thr_value, clahe)
+    
     dominant_color = None
 
     background_color = get_background_color(original_image)
@@ -39,15 +40,17 @@ def find_artifact_contour_and_color(original_image, pearl_view, configuration, t
                     mean_color = cv2.mean(original_image, mask=mask)[:3]  # get color of the found area; cant be too similar
                     
                     if np.allclose(mean_color, background_color, atol=BACKGROUND_SIMILARITY_TOLERANCE):
+                        print('A contour was detected but was too close to the background; thus it was skipped')
                         continue  
 
-                    if np.allclose(mean_color, background_color, atol=60):
-                        print(f"This one is with a tolerance 60 similar to the background:")
-                    
+                    if not clahe:
+                        if np.allclose(mean_color, background_color, atol=60):
+                            print(f"This one is with a tolerance 60 similar to the background: trying with different threshold function")
+                            return find_artifact_contour_and_color(original_image, bead_view, configuration, thr_value, hole_similarity, clahe=True)                     
                     smallest_contr = contour
 
                     for sub_index, sub_contour in enumerate(contours):
-                        if hierarchy[0][sub_index][3] == idx and pearl_view == 'B':
+                        if hierarchy[0][sub_index][3] == idx and bead_view == 'B':
                             inner_area = cv2.contourArea(sub_contour)
                             if inner_area > INNER_AREA_LIMIT:  
                                 
@@ -66,9 +69,10 @@ def find_artifact_contour_and_color(original_image, pearl_view, configuration, t
         print('Artifact contour found.')
     else:
         if thr_value != 160:
-            THR_VALUE = 160
-            NEW_HOLE_SIMILARITY_TOLERANCE = 25 # im not sure why i put a new similarity tolerance, have to check this 
-            return find_artifact_contour_and_color(original_image, pearl_view,configuration, 160, NEW_HOLE_SIMILARITY_TOLERANCE) # add logging for the change of the value
+            new_thr_value = 160
+            print('retrying with new thr_value; i think i create a loop here')
+            NEW_HOLE_SIMILARITY_TOLERANCE = 25 
+            return find_artifact_contour_and_color(original_image, bead_view,configuration, new_thr_value, NEW_HOLE_SIMILARITY_TOLERANCE) # new hole similarity bcus of the image quality
 
          # ERROR HANDLING HERE: means image is not adaptable for threshold
     

@@ -7,9 +7,8 @@ from size_calculation import get_horizontal_dimension
 from pixel_per_metric import calculate_ppm
 
 
-ORIGINAL_SCALE_SIZE_mm = 50   # this is a fixed value, need to make this adaptable to user input 
 
-def crop_artifact_and_measure(paths, config, merge, transparent):
+def crop_artifact_and_measure(paths, config, merge, transparent, scale_size):
     processed_images = {}
     length_viewA = []
     width_viewB = []
@@ -25,7 +24,7 @@ def crop_artifact_and_measure(paths, config, merge, transparent):
         
         original_image = cv2.imread(path)
 
-        ppm = calculate_ppm(original_image, ORIGINAL_SCALE_SIZE_mm, config)
+        ppm = calculate_ppm(original_image, scale_size, config)
 
         artifact_contour, inner_contour, all_colors = find_artifact_contour_and_color(original_image, pearl_view, config) # maybe i can split later then the color from img
     
@@ -41,7 +40,7 @@ def crop_artifact_and_measure(paths, config, merge, transparent):
         if object_width != 0.0:
             if pearl_view == 'A':
                 length_viewA.append(object_width)
-                all_dom_colors.append(np.array(all_colors))
+                all_dom_colors.append(np.array(all_colors))  # colors are only extracted from view a, b is skipped cus of the hole
             else:
                 width_viewB.append(object_width) 
         else:
