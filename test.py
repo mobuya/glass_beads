@@ -13,8 +13,10 @@ from enhance_threshold import enhance_and_threshold
 
 #image_path = "combine_all/ENZFSCH_333_026_B.png"
 
-image_path = "combine_all/ENZFSCH_340_138_A.png"
+#image_path = "combine_all/ENZFSCH_340_138_A.png"
+#image_path = "combine_all/ENZFSCH_340_017_B1.png"
 
+image_path = "combine_all/ENZFSCH_340_117_B2.png"
 '''
 clahe works with pearls, that have a nice bright image, didnt trry it with other normal colored pearls, but with darker images it wont work, 
 oopsie, 
@@ -25,7 +27,7 @@ try:
     with config_context(image_path) as config:
         image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
-        clahe = cv2.createCLAHE(clipLimit=0.7, tileGridSize=(3, 3))
+        clahe = cv2.createCLAHE(clipLimit=0.9, tileGridSize=(7, 7))
 
         enhanced_image = clahe.apply(image)
 

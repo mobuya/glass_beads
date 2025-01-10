@@ -9,8 +9,7 @@ from find_object import get_background_color
 template_path = "fitted_color_palette.png"
 
 def calculate_ppm(original_image, scale_length, configuration,  thr_value = 160):  # im not sure which value to use for the scale tbh
-    #original_image = cv2.imread(image_path)
-
+   
     threshold_image = enhance_and_threshold(original_image, configuration, True,  thr_value)
 
     image_h,_ , _ = original_image.shape
@@ -31,7 +30,7 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 160)
         
 
     '''
-    In case the scale contour cant be found it is usually due to the scale and color palette being to close to each other.
+    In case the scale contour cant be found it is usually due to the scale and color palette being too close to each other.
     Removing the color palette(template) from the image makes it easier to find the scale contour.
     If this also results in no contour, either the scale is not present or the image has an invalid format for this tool.
     '''

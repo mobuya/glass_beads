@@ -4,6 +4,7 @@ import numpy as np
  
 def get_horizontal_dimension(pearl_contour, pixel_metric, configuration):
     if pixel_metric is None:
+        print('The scale contour could not be calculated.')
         return 0.0        
     if pearl_contour is None:
         print('No valid contour found for size prediction.')
@@ -14,7 +15,7 @@ def get_horizontal_dimension(pearl_contour, pixel_metric, configuration):
     measured_width = w / pixel_metric  
 
     # Adjust for dilation adaptation
-    DILATE_ADAPTATION = configuration["DILATE_ADAPTATION"]   # THIS DEPENDS ALSO ON THE IMAGE RESOLUTIN
+    DILATE_ADAPTATION = configuration["DILATE_ADAPTATION"]   # THIS DEPENDS ALSO ON THE IMAGE RESOLUTION
 
     measured_width = measured_width - DILATE_ADAPTATION
     measured_width = round(measured_width, 1)

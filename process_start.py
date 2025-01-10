@@ -10,23 +10,25 @@ from openpyxl.styles import PatternFill
 from color_converter import convert_for_xlsx
 from crop_and_measure import crop_artifact_and_measure
 
+# toggle switch
+
+MERGE = True  
+TRANSPARENT = True
+ORIGINAL_SCALE_SIZE_mm = 50   # this is a fixed value, need to make this adaptable to user input 
+
+# *************** 
 
 start_time = datetime.now()
 
 UPLOAD_FOLDER = 'combine_all/' 
-OUTPUT_FOLDER = 'processed_pearl_output'
+OUTPUT_FOLDER_NAME = 'processed_pearl_output'
+output_counter = 1
+
 ALLOWED_FILE_TYPES = ('.jpg', '.jpeg', '.png')
-
 XLSX_FILE = 'pearl_data_color.xlsx'
-
-MERGE = True  
-TRANSPARENT = True
 
 object_dictionary = {}
 
-'''
-The folder maybe shouldnt be delete if it already exists: maybe append the date and time to the results folder
-'''
 
 for filename in os.listdir(UPLOAD_FOLDER):
     if filename.endswith(ALLOWED_FILE_TYPES):  
@@ -41,17 +43,12 @@ for filename in os.listdir(UPLOAD_FOLDER):
         print('Format not supported! Allowed formats are: jpg, jpeg and png.') 
 
 
-
-if not os.path.exists(OUTPUT_FOLDER):
-        os.makedirs(OUTPUT_FOLDER)
-else:
-    try:
-          shutil.rmtree(OUTPUT_FOLDER)
-          os.makedirs(OUTPUT_FOLDER)
-          print('Directiory for output already existed, created new one.')
-    except OSError as e:
-        print("Error: %s - %s." % (e.filename, e.strerror))
-
+output_path = OUTPUT_FOLDER_NAME
+while os.path.exists(output_path):
+        print(f"Folder {output_path} already exists!")
+        output_path = OUTPUT_FOLDER_NAME + f"_{output_counter}"
+        output_counter += 1
+os.makedirs(output_path)
 
 
 workbook = Workbook()
@@ -69,13 +66,13 @@ for pearl_id, views in object_dictionary.items():
 
     try:
         with config_context(main_path) as config:
-                processed_images, obj_len, obj_width, colors = crop_artifact_and_measure(required_views, config, MERGE, TRANSPARENT)
+                processed_images, obj_len, obj_width, colors = crop_artifact_and_measure(required_views, config, MERGE, TRANSPARENT, ORIGINAL_SCALE_SIZE_mm)
                 rgb_values = []
                 cell_fills = []
                 for id, image in processed_images.items():
-                    output_path = os.path.join(OUTPUT_FOLDER, f"{id}.png")
-                    cv2.imwrite(output_path, image)
-                    print('Saved: ', output_path)
+                    output_image_path = os.path.join(output_path, f"{id}.png")
+                    cv2.imwrite(output_image_path, image)
+                    print('Saved: ', output_image_path)
 
                 wA_str = f"{obj_len:.2f}".replace('.', ',')
                 wB_str = f"{obj_width:.2f}".replace('.', ',')
@@ -100,7 +97,9 @@ for pearl_id, views in object_dictionary.items():
     except ValueError as e:
         print(e)
 
-workbook.save(XLSX_FILE)
+# join paths 
+#workbook.save(XLSX_FILE)
+workbook.save(os.path.join(output_path, XLSX_FILE))
 end_time = datetime.now()
 
 print('Done!')
