@@ -8,9 +8,9 @@ from find_object import get_background_color
 
 template_path = "fitted_color_palette.png"
 
-def calculate_ppm(original_image, scale_length, configuration,  thr_value = 160):  # im not sure which value to use for the scale tbh
+def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180):  # im not sure which value to use for the scale tbh
    
-    threshold_image = enhance_and_threshold(original_image, configuration, True,  thr_value)
+    threshold_image = enhance_and_threshold(original_image, configuration, thr_value)  # CHANGES HERE TO FALSE
 
     image_h,_ , _ = original_image.shape
 
@@ -50,7 +50,7 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 160)
 
         cv2.rectangle(original_image, top_left, bottom_right, bg_color, -1)
 
-        threshold_image = enhance_and_threshold(original_image, configuration, True,  160)
+        threshold_image = enhance_and_threshold(original_image, configuration, 160)
         contours, hierarchy = cv2.findContours(threshold_image, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
 
         for idx, contour in enumerate(contours):

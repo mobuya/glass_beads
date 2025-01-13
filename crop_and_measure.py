@@ -2,9 +2,10 @@ import numpy as np
 import cv2
 from id_parser import parse_filename_from_path, parse_pearl_id_and_view
 from place_object import place_obj_on_background
-from find_object import find_artifact_contour_and_color
+from find_object import find_artifact_contour
 from size_calculation import get_horizontal_dimension
 from pixel_per_metric import calculate_ppm
+from color_extraction import get_dominant_color
 
 
 
@@ -26,7 +27,7 @@ def crop_artifact_and_measure(paths, config, merge, transparent, scale_size):
 
         ppm = calculate_ppm(original_image, scale_size, config)
 
-        artifact_contour, inner_contour, all_colors = find_artifact_contour_and_color(original_image, pearl_view, config) # maybe i can split later then the color from img
+        artifact_contour, inner_contour = find_artifact_contour(original_image, pearl_view, config) # maybe i can split later then the color from img
     
         if artifact_contour is None:
             '''
@@ -34,17 +35,21 @@ def crop_artifact_and_measure(paths, config, merge, transparent, scale_size):
             '''
             print(f"For image no artifact was found; thus cant segment nor predict size: {path}")
             continue
+        
 
+        all_colors = get_dominant_color(original_image, artifact_contour)
         object_width = get_horizontal_dimension(artifact_contour, ppm, config) 
 
         if object_width != 0.0:
             if pearl_view == 'A':
                 length_viewA.append(object_width)
-                all_dom_colors.append(np.array(all_colors))  # colors are only extracted from view a, b is skipped cus of the hole
             else:
                 width_viewB.append(object_width) 
         else:
-            print('No object found')
+            print('The scale contour wasnt detected so the object couldnt be measured')
+
+        if pearl_view == 'A':
+                all_dom_colors.append(np.array(all_colors))  # colors are only extracted from view a, b is skipped cus of the hole
 
         if merge:
             output_file = pearl_id

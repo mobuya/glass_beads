@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-def enhance_and_threshold(image, configuration, dilated = False,  threshold_value = 223, CLAHE_BOOL = False):
+def enhance_and_threshold(image, configuration, threshold_value = 223, CLAHE_BOOL = False):
     # original ist 7952x5304
     MORPH_KERNEL_SIZE = configuration["MORPH_KERNEL_SIZE"]
     MORPH_ITERATIONS = configuration["MORPH_ITERATIONS"]
@@ -13,8 +13,7 @@ def enhance_and_threshold(image, configuration, dilated = False,  threshold_valu
     img = cv2.medianBlur(gray, 5)
 
     if CLAHE_BOOL:
-        print('CLAHE is true')
-        clahe = cv2.createCLAHE(clipLimit=0.9, tileGridSize=(7, 7))
+        clahe = cv2.createCLAHE(clipLimit=0.9, tileGridSize=(8, 8))
         enhanced_image = clahe.apply(img)
         _, threshold_image = cv2.threshold(enhanced_image, threshold_value, 255, cv2.THRESH_BINARY_INV)
     else:   
@@ -23,10 +22,7 @@ def enhance_and_threshold(image, configuration, dilated = False,  threshold_valu
     img = cv2.medianBlur(threshold_image, 15)  
 
     closing = cv2.morphologyEx(img, cv2.MORPH_CLOSE, MORPH_KERNEL_SIZE, iterations=MORPH_ITERATIONS) 
-
-    if dilated:
-        dilated = cv2.dilate(closing, DILATE_KERNEL_SIZE, iterations=DILATE_ITERATIONS)
-        return dilated
     
-    smooth_outline = cv2.dilate(closing, np.ones((3, 3), np.uint8), iterations = 1)
+    smooth_outline = cv2.dilate(closing, DILATE_KERNEL_SIZE, iterations=DILATE_ITERATIONS)
+    
     return smooth_outline
