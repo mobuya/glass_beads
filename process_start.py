@@ -20,7 +20,7 @@ ORIGINAL_SCALE_SIZE_mm = 50   # this is a fixed value, need to make this adaptab
 
 start_time = datetime.now()
 
-UPLOAD_FOLDER = 'combine_all/' 
+UPLOAD_FOLDER = 'upload_images/' 
 OUTPUT_FOLDER_NAME = 'processed_pearl_output'
 output_counter = 1
 
@@ -61,6 +61,10 @@ sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 
 for pearl_id, views in object_dictionary.items(): 
     processed_images = {}
 
+    rgb_values = ["(X, X, X)", "(X, X, X)", "(X, X, X)"]  
+    white_fill = PatternFill(start_color='FFFFFFFF', end_color='FFFFFFFF', fill_type="solid")
+    cell_fills = [white_fill, white_fill, white_fill]
+
     required_views = [object_dictionary[pearl_id][v] for v in views]
     main_path = required_views[0] 
 
@@ -79,11 +83,6 @@ for pearl_id, views in object_dictionary.items():
 
                 if colors is not None:
                     rgb_values, cell_fills = convert_for_xlsx(colors)
-                else:
-                    rgb_values = ["(X, X, X)", "(X, X, X)", "(X, X, X)"]  # Use a plain list
-                    white_fill = PatternFill(start_color='FFFFFFFF', end_color='FFFFFFFF', fill_type="solid")
-                    cell_fills = [white_fill, white_fill, white_fill]  # Use a plain list
-
 
                 row = [pearl_id, wA_str, wB_str, ' ', rgb_values[0], ' ', rgb_values[1], ' ', rgb_values[2]]
                 sheet.append(row)

@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from enhance_threshold import enhance_and_threshold
 from find_object import THR_VALUE
 
 
