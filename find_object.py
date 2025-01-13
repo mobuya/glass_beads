@@ -1,19 +1,15 @@
 import cv2
 import numpy as np
 from enhance_threshold import enhance_and_threshold
-from color_extraction import get_dominant_color
 
 
 THR_VALUE = 223 # *********** 
 BACKGROUND_SIMILARITY_TOLERANCE = 25
 HOLE_SIMILARITY_TOLERANCE = 10  
 
-def find_artifact_contour_and_color(original_image, bead_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE, clahe = False):
+def find_artifact_contour(original_image, bead_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE, clahe = False):
 
-    threshold_image = enhance_and_threshold(original_image, configuration, False, thr_value, clahe)
-    
-    dominant_color = None
-
+    threshold_image = enhance_and_threshold(original_image, configuration, thr_value, clahe)
     background_color = get_background_color(original_image)
 
     image_h, image_w, _ = original_image.shape
@@ -46,7 +42,8 @@ def find_artifact_contour_and_color(original_image, bead_view, configuration, th
                     if not clahe:
                         if np.allclose(mean_color, background_color, atol=60):
                             print(f"This one is with a tolerance 60 similar to the background: trying with different threshold function")
-                            return find_artifact_contour_and_color(original_image, bead_view, configuration, thr_value, hole_similarity, clahe=True)                     
+                            return find_artifact_contour(original_image, bead_view, configuration, thr_value, hole_similarity, clahe=True)  
+                                           
                     smallest_contr = contour
 
                     for sub_index, sub_contour in enumerate(contours):
@@ -58,7 +55,7 @@ def find_artifact_contour_and_color(original_image, bead_view, configuration, th
                                 cv2.drawContours(inner_mask, [sub_contour], -1, 255, -1)
                                 inner_mean_color = cv2.mean(original_image, mask = inner_mask)[:3]
 
-                                if np.allclose(inner_mean_color, background_color, atol = hole_similarity):  # similarity tol changed for 340_139 -> 10 works, for rethresh
+                                if np.allclose(inner_mean_color, background_color, atol = hole_similarity):  # similarity tol changed for 340_139 
                                     inner_contour = sub_contour
                                     break
 
@@ -72,18 +69,12 @@ def find_artifact_contour_and_color(original_image, bead_view, configuration, th
             new_thr_value = 160
             print('retrying with new thr_value; i think i create a loop here')
             NEW_HOLE_SIMILARITY_TOLERANCE = 25 
-            return find_artifact_contour_and_color(original_image, bead_view,configuration, new_thr_value, NEW_HOLE_SIMILARITY_TOLERANCE) # new hole similarity bcus of the image quality
+            return find_artifact_contour(original_image, bead_view,configuration, new_thr_value, NEW_HOLE_SIMILARITY_TOLERANCE) # new hole similarity bcus of the image quality
 
          # ERROR HANDLING HERE: means image is not adaptable for threshold
     
-    # ****************** COLOR EXTRACTION ******************
-    '''
-    Color extraction is placed here because of optimization issues !!!
-    '''
-    if smallest_contr is not None:
-        dominant_color = get_dominant_color(original_image, smallest_contr)
         
-    return smallest_contr, inner_contour, dominant_color
+    return smallest_contr, inner_contour
     
 
 def get_background_color(image):
