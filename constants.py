@@ -16,9 +16,9 @@ CONFIGURATION = None
 PREDEFINED_CONFIGS = {
     "max_size": {
         "MORPH_KERNEL_SIZE": np.ones((5, 5), np.uint8),
-        "MORPH_ITERATIONS": 6,
-        "DILATE_KERNEL_SIZE": np.ones((5, 5), np.uint8),  # 3 , 3   it = 1
-        "DILATE_ITERATIONS": 2,
+        "MORPH_ITERATIONS": 3,
+        "DILATE_KERNEL_SIZE": np.ones((2, 2), np.uint8),  # 3 , 3   it = 1
+        "DILATE_ITERATIONS": 1,
         # find object
         "MIN_AREA": 45000,
         "INNER_AREA": 2500,
@@ -30,8 +30,8 @@ PREDEFINED_CONFIGS = {
         "IMG_W_PADDING": 300
     },
     "min_size": {
-        "MORPH_KERNEL_SIZE": np.ones((5, 5), np.uint8),
-        "MORPH_ITERATIONS": 4,
+        "MORPH_KERNEL_SIZE": np.ones((2, 2), np.uint8),
+        "MORPH_ITERATIONS": 2,
         "DILATE_KERNEL_SIZE": np.ones((2, 2), np.uint8),
         "DILATE_ITERATIONS": 1,
         # find object
