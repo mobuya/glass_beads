@@ -1,31 +1,35 @@
 from openpyxl.styles import PatternFill
 
+
+
 def convert_for_xlsx(dominant_colors):
+    '''
+    Converts an array of RGB color values into two formats suitable for use in an Excel (.xlsx) file:
+    a list of RGB string representations and a list of `PatternFill` objects for cell coloring.
+
+    Parameters
+    ----------
+    dominant_colors : list of tuples
+        A list of RGB color tuples, where each tuple contains three integers (R, G, B) ranging from 0 to 255.
+
+    Returns
+    -------
+    rgb_colors : list of str
+        A list of RGB color values formatted as strings, e.g., "(255, 0, 0)" for red.
+
+    cell_fills : list of openpyxl.styles.PatternFill
+        A list of `PatternFill` objects with solid fills corresponding to each color, used for Excel cell formatting.
+    '''
+
     rgb_colors = []
     cell_fills = []
 
-    first_col = dominant_colors[0]
-    second_col = dominant_colors[1]
-    third_col = dominant_colors[2]
+    for color in dominant_colors:
+        rgb_value = f"({color[0]}, {color[1]}, {color[2]})"
+        rgb_colors.append(rgb_value)
 
-    rgb_color1 = f"({first_col[0]}, {first_col[1]}, {first_col[2]})"
-    rgb_color2 = f"({second_col[0]}, {second_col[1]}, {second_col[2]})"
-    rgb_color3 = f"({third_col[0]}, {third_col[1]}, {third_col[2]})"
-
-    rgb_colors.append(rgb_color1)
-    rgb_colors.append(rgb_color2)
-    rgb_colors.append(rgb_color3)
-
-    color_hex1 = f"{first_col[0]:02X}{first_col[1]:02X}{first_col[2]:02X}"
-    color_hex2 = f"{second_col[0]:02X}{second_col[1]:02X}{second_col[2]:02X}"
-    color_hex3 = f"{third_col[0]:02X}{third_col[1]:02X}{third_col[2]:02X}"
-
-    color_fill1 = PatternFill(start_color=color_hex1, end_color=color_hex1, fill_type="solid")
-    color_fill2 = PatternFill(start_color=color_hex2, end_color=color_hex2, fill_type="solid")
-    color_fill3 = PatternFill(start_color=color_hex3, end_color=color_hex3, fill_type="solid")
-
-    cell_fills.append(color_fill1)
-    cell_fills.append(color_fill2)
-    cell_fills.append(color_fill3)
+        hex_value = f"{color[0]:02X}{color[1]:02X}{color[2]:02X}"
+        color_value = PatternFill(start_color=hex_value, end_color=hex_value, fill_type="solid")
+        cell_fills.append(color_value)
 
     return rgb_colors, cell_fills

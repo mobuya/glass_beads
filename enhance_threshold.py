@@ -1,9 +1,40 @@
 import cv2
-import numpy as np
 
 
 def enhance_and_threshold(image, configuration, threshold_value = 223, CLAHE_BOOL = False):
-    # original ist 7952x5304
+    '''
+    Enhances and thresholds an input image to improve contour detection for object segmentation.  
+    The function optionally applies Contrast Limited Adaptive Histogram Equalization (CLAHE), followed by thresholding, morphological closing, and dilation to smooth object outline.
+
+    Parameters
+    ----------
+    image : numpy.ndarray
+        The input image.
+
+    configuration : dict
+        Dictionary containing kernel sizes and iteration counts for morphological operations.
+
+    threshold_value : int, optional (default=223)
+        Threshold value for binary thresholding; pixels below this value are set to 255 (white), and above to 0 (black).
+
+    CLAHE_BOOL : bool, optional (default=False)
+        If True, applies CLAHE to enhance image contrast before thresholding.  
+        If False, the grayscale image is directly thresholded.
+
+    Returns
+    -------
+    smooth_outline : numpy.ndarray
+        The processed binary image with enhanced and smoothed object contours.  
+        White regions represent the detected objects, and black regions represent the background.
+
+    Notes
+    -----
+    - **CLAHE** is useful for images with uneven lighting or low contrast, useful when artifacts color too similar to background.  
+    - **Morphological Closing** closes small gaps in object contours.  
+    - **Dilation** smooths object outlines for cleaner segmentation.  
+    - IMPORTANT: Proper kernel sizes and iteration counts in `configuration` significantly affect the result.
+    '''
+    
     MORPH_KERNEL_SIZE = configuration["MORPH_KERNEL_SIZE"]
     MORPH_ITERATIONS = configuration["MORPH_ITERATIONS"]
     DILATE_KERNEL_SIZE = configuration["DILATE_KERNEL_SIZE"]

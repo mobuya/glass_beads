@@ -8,8 +8,38 @@ from find_object import get_background_color
 
 template_path = "fitted_color_palette.png"
 
-def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180):  # im not sure which value to use for the scale tbh
-   
+def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180):
+    '''
+    Calculates the pixel-per-millimeter (ppm) ratio based on the detected scale in the image.
+
+    This function identifies the scale bar in the image and computes how many pixels correspond to one millimeter using the known physical length of the scale.
+
+    Parameters
+    ----------
+    original_image : numpy.ndarray
+        The input image containing the scale bar.
+
+    scale_length : float
+        The real-world length of the scale bar in millimeters (e.g., 50 for a 5 cm scale).
+
+    configuration : dict
+        Configuration dictionary with processing parameters, including:
+            - "MIN_SCALE_AREA": Minimum area to consider a contour as the scale.
+
+    thr_value : int, optional (default=180)
+        Threshold value for binary thresholding; pixels below this value are set to 255 (white), and above to 0 (black).
+
+    Returns
+    -------
+    pixel_metric : float or None
+        The calculated pixel-per-millimeter ratio; returns None if the scale cannot be detected.
+
+    Notes
+    -----
+    - If the scale bar is not detected, the function attempts to remove the color palette using template matching and retries the detection.
+    - IMPORTANT: The function assumes the scale is located in the lower half of the image!
+    '''
+  
     threshold_image = enhance_and_threshold(original_image, configuration, thr_value)  # CHANGES HERE TO FALSE
 
     image_h,_ , _ = original_image.shape
@@ -22,7 +52,7 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180)
 
     for idx, contour in enumerate(contours):
         area = cv2.contourArea(contour)
-        if hierarchy[0][idx][3] == -1 and area > MIN_SCALE_AREA:  #  just look at outer contours
+        if hierarchy[0][idx][3] == -1 and area > MIN_SCALE_AREA: 
            x, y, w, h = cv2.boundingRect(contour)
            if y > (image_h * 0.5):
                scale_contour = contour
@@ -31,11 +61,11 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180)
 
     '''
     In case the scale contour cant be found it is usually due to the scale and color palette being too close to each other.
-    Removing the color palette(template) from the image makes it easier to find the scale contour.
+    Removing the color palette (template) from the image makes it easier to find the scale contour.
     If this also results in no contour, either the scale is not present or the image has an invalid format for this tool.
     '''
     if scale_contour is None:
-        print('Inside the new function that removes the color palette if the scale is not found.')
+        print('Inside the new function that removes the color palette if the scale is not found.') # TODO: Logging
         bg_color = get_background_color(original_image)
         template = cv2.imread(template_path,cv2.IMREAD_GRAYSCALE)
         best_method = 'TM_CCOEFF_NORMED'  # robust against light and some other invariance 
@@ -55,10 +85,9 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180)
 
         for idx, contour in enumerate(contours):
             area = cv2.contourArea(contour)
-            if hierarchy[0][idx][3] == -1 and area > MIN_SCALE_AREA:  #  just look at outer contours
+            if hierarchy[0][idx][3] == -1 and area > MIN_SCALE_AREA: 
                 x, y, w, h = cv2.boundingRect(contour)
                 if y > (image_h * 0.5):
-                    print('It found a valid scale contour')
                     scale_contour = contour
                     break
 
@@ -74,17 +103,34 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180)
         (tlblX, tlblY) = midpoint(tl, bl)
         (trbrX, trbrY) = midpoint(tr, br)
         
-        # measure the euclidian distance between the midpoints
         scale_width = dist.euclidean((tlblX, tlblY), (trbrX,trbrY))
 
-        known_scale_length = scale_length # its in mm
+        known_scale_length = scale_length 
 
-        pixel_metric = scale_width / known_scale_length  # the width in the image should be irl 5 cm/ 50 mm
+        pixel_metric = scale_width / known_scale_length
     else:
-        print('There is no scale on this image bruv.')
+        print('There is no scale on this image bruv.') # TODO: Error handling, logging, save the ID where no scale present
 
        
-    return pixel_metric # can return none, careful
+    return pixel_metric
 
 def midpoint(ptA, ptB):
-    return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
+    '''
+    Calculates the midpoint between two points.
+    Euclidean distance
+
+    Parameters
+    ----------
+    ptA : tuple
+        The (x, y) coordinates of the first point.
+    ptB : tuple
+        The (x, y) coordinates of the second point.
+
+    Returns
+    -------
+    midpoint: tuple
+        The (x, y) coordinates of the midpoint between ptA and ptB.
+    '''
+
+    midpoint = ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
+    return midpoint

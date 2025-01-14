@@ -1,14 +1,27 @@
 import numpy as np
 
+
+# TODO: TEST WITH DIFFERENT IMAGE SIZES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+
 '''
 the maximal has 42177408
 and the min 2401200
 
 make scenarios for above 40, between 30-40 and 20 -30
 
+'''
 
-this has to be tested with different sizes, minimum is 6000 x 6000
-
+'''
+MORPH_KERNEL_SIZE: Kernel size for the morphological closing operation.  
+MORPH_ITERATIONS: Number of iterations for the closing operation.  
+DILATE_KERNEL_SIZE: Kernel size for the dilation operation.  
+DILATE_ITERATIONS: Number of iterations for the dilation operation.
+MIN_AREA: Minimum contour area to be considered as the artifact (avoid noise).  
+INNER_AREA: Minimum area for detecting inner contours (detecting holes in view B).  
+MIN_SCALE_AREA: Minimum area required to detect the scale object for pixel-per-metric calculation.  
+DILATE_ADAPTATION: Adjustment value for dilation during size prediction to account for contour imperfections. 
+IMG_H_PADDING: Horizontal padding added when placing the object on the background.  
+IMG_W_PADDING: Vertical padding added when placing the object on the background.  
 '''
 
 CONFIGURATION = None
@@ -25,7 +38,7 @@ PREDEFINED_CONFIGS = {
         # pixel per metric
         "MIN_SCALE_AREA": 1000000,
         # size prediction
-        "DILATE_ADAPTATION": 0.25,
+        "DILATE_ADAPTATION": 0.2,
         "IMG_H_PADDING": 400,
         "IMG_W_PADDING": 300
     },

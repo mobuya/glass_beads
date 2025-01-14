@@ -3,11 +3,57 @@ import numpy as np
 from enhance_threshold import enhance_and_threshold
 
 
-THR_VALUE = 223 # *********** 
+THR_VALUE = 223  
 BACKGROUND_SIMILARITY_TOLERANCE = 25
 HOLE_SIMILARITY_TOLERANCE = 10  
 
 def find_artifact_contour(original_image, bead_view, configuration, thr_value = THR_VALUE, hole_similarity = HOLE_SIMILARITY_TOLERANCE, clahe = False):
+    '''
+    Detects the contour of the artifact (bead) in the image, returning also the hole contour for proper bead view. 
+    In case of a bead having a similar color to the background, a new threshold function is called.
+
+    Parameters
+    ----------
+    original_image : numpy.ndarray
+        The input image of the bead, where the contour is found.
+
+    bead_view : str
+        Indicates the view of the bead ('A' for front view, 'B' for hole view).
+
+    configuration : dict 
+        Dictionary containing processing parameters.
+
+    thr_value : int, optional (default=223)
+        Threshold value used for image binarization. Defaults to a predefined constant `THR_VALUE`.
+
+    hole_similarity : int, optional (default=10)
+        Tolerance for determining similarity between the inner contour color and background color. 
+
+    clahe : bool, optional (default=False)
+        Flag to enable Contrast Limited Adaptive Histogram Equalization (CLAHE) for better contrast. 
+        Used when beads color too similar too background, otherwise its contours aren't clean.
+
+    Returns
+    -------
+    smallest_contr : numpy.ndarray or None
+        The detected outer contour of the artifact; returns `None` if not found.
+
+    inner_contour : numpy.ndarray or None
+        The detected inner contour (for pearls with holes, i.e., view B); returns `None` if not found.
+
+    Notes
+    -----
+    - If no contour was found, the function is called again with a new threshold value of 160. 
+      Also changing the hole similarity to 25, since mainly the function is called again if the brightness is too low.
+    - IMPORTANT: The function assumes the bead is around the middle of the image, and returns the first found contour that fulfills the following criteria:
+        * it's an outer contour
+        * the area is bigger than configuration["MIN_AREA"] and smaller than 1/3 of the image
+        * it upper left corner is within the upper 80% of the image height and the left 50% of the image width
+
+    !!!
+    PLEASE follow a consistent image layout for this function to return optimal solutions!
+    !!!
+    '''
 
     threshold_image = enhance_and_threshold(original_image, configuration, thr_value, clahe)
     background_color = get_background_color(original_image)
@@ -26,14 +72,14 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
 
     for idx, contour in enumerate(contours):
         area = cv2.contourArea(contour)
-        if hierarchy[0][idx][3] == -1:  #  just look at outer contours
+        if hierarchy[0][idx][3] == -1:  
             if area >= MIN_AREA:
                 x, y, _, _ = cv2.boundingRect(contour)
                 if y < (image_h * 0.8) and x < (image_w * 0.5) and area < area_limit:  # check position and area size
 
                     mask = np.zeros(threshold_image.shape, dtype=np.uint8)
                     cv2.drawContours(mask, [contour], -1, 255, -1)
-                    mean_color = cv2.mean(original_image, mask=mask)[:3]  # get color of the found area; cant be too similar
+                    mean_color = cv2.mean(original_image, mask=mask)[:3]  
                     
                     if np.allclose(mean_color, background_color, atol=BACKGROUND_SIMILARITY_TOLERANCE):
                         print('A contour was detected but was too close to the background; thus it was skipped')
@@ -55,38 +101,42 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
                                 cv2.drawContours(inner_mask, [sub_contour], -1, 255, -1)
                                 inner_mean_color = cv2.mean(original_image, mask = inner_mask)[:3]
 
-                                if np.allclose(inner_mean_color, background_color, atol = hole_similarity):  # similarity tol changed for 340_139 
+                                if np.allclose(inner_mean_color, background_color, atol = hole_similarity):  
                                     inner_contour = sub_contour
                                     break
 
                     break
-
-
+                
     if smallest_contr is not None:
         print('Artifact contour found.')
     else:
         if thr_value != 160:
             new_thr_value = 160
-            print('retrying with new thr_value; i think i create a loop here')
             NEW_HOLE_SIMILARITY_TOLERANCE = 25 
-            return find_artifact_contour(original_image, bead_view,configuration, new_thr_value, NEW_HOLE_SIMILARITY_TOLERANCE) # new hole similarity bcus of the image quality
-
-         # ERROR HANDLING HERE: means image is not adaptable for threshold
+            return find_artifact_contour(original_image, bead_view,configuration, new_thr_value, NEW_HOLE_SIMILARITY_TOLERANCE) 
+        # TODO: Error handling 
     
         
     return smallest_contr, inner_contour
     
+# TODO: Logging in above function, save IDs of pearls where clahe was set to true so the user can check those beads since the output may not be clean.
 
 def get_background_color(image):
     '''
-    Find background color by extracting the colors of the 4 corners and taking the mean.
-
-    Parameters:
+    Estimates the background color of an image by averaging the colors of its four corners.
+    This function works for this tool since the image layout is consistent, thus having clear corners.
+    
+    Parameters
     ----------
+    image : numpy.ndarray
+        The input image whose background color is to be determined.
 
-    image: image to calculate the background of.
+    Returns
+    -------
+    background_color : numpy.ndarray
+        The estimated background color as a 3-element array representing the (BGR) color values.
     '''
-    corners = [image[0, 0], image[0, -1], image[-1, 0],   image[-1, -1]]
+    corners = [image[0, 0], image[0, -1], image[-1, 0], image[-1, -1]]
     corner_samples = np.array(corners)
     
     background_color = corner_samples.mean(axis=0)
