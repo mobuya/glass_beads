@@ -11,8 +11,11 @@ from color_converter import convert_for_xlsx
 from crop_and_measure import crop_artifact_and_measure
 
 
+
 '''
 This is the MAIN file, this is where everything starts and everything gets done!
+
+----> OpenCV version: 4.9.0 (!!!)
 '''
 
 # toggle switch
