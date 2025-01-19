@@ -8,3 +8,6 @@ opencvenv/
 *.png 
 *.jpg 
 *.jpeg
+
+#Ignore output folder
+ processed_pearl_output/
