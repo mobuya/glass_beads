@@ -36,11 +36,18 @@ def config_context(path):
     '''
 
     img = cv2.imread(path)
+    # RESIZING PART 2!
+    #img = cv2.resize( img, (6000, 4000))
+    #img = cv2.resize( img, (6600, 4400))
+    #img = cv2.resize( img, (7000, 4667))
+    #img = cv2.resize( img, (7500, 5000))
     image_pixels = img.shape[0] * img.shape[1]
 
     if image_pixels > 35000000:
         config = constants.PREDEFINED_CONFIGS["max_size"]
+        print('max_size config')
     elif image_pixels > 20000000:
+        print('min_size config')
         config = constants.PREDEFINED_CONFIGS["min_size"]
     else:
         raise ValueError("Invalid image size!") # TODO: Error handling 

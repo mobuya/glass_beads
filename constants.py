@@ -4,14 +4,6 @@ import numpy as np
 # TODO: TEST WITH DIFFERENT IMAGE SIZES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 
 '''
-the maximal has 42177408
-and the min 2401200
-
-make scenarios for above 40, between 30-40 and 20 -30
-
-'''
-
-'''
 MORPH_KERNEL_SIZE: Kernel size for the morphological closing operation.  
 MORPH_ITERATIONS: Number of iterations for the closing operation.  
 DILATE_KERNEL_SIZE: Kernel size for the dilation operation.  
@@ -30,23 +22,25 @@ PREDEFINED_CONFIGS = {
     "max_size": {
         "MORPH_KERNEL_SIZE": np.ones((5, 5), np.uint8),
         "MORPH_ITERATIONS": 3,
-        "DILATE_KERNEL_SIZE": np.ones((2, 2), np.uint8),  # 3 , 3   it = 1
+        "DILATE_KERNEL_SIZE": np.ones((2, 2), np.uint8), 
         "DILATE_ITERATIONS": 1,
+        "CLIP_LIMIT": 0.9,
         # find object
         "MIN_AREA": 45000,
         "INNER_AREA": 2500,
         # pixel per metric
-        "MIN_SCALE_AREA": 1000000,
+        "MIN_SCALE_AREA": 900000,
         # size prediction
         "DILATE_ADAPTATION": 0.2,
-        "IMG_H_PADDING": 400,
-        "IMG_W_PADDING": 300
+        "IMG_H_PADDING": 400, # 400
+        "IMG_W_PADDING": 300 # 300
     },
     "min_size": {
         "MORPH_KERNEL_SIZE": np.ones((2, 2), np.uint8),
-        "MORPH_ITERATIONS": 2,
-        "DILATE_KERNEL_SIZE": np.ones((2, 2), np.uint8),
-        "DILATE_ITERATIONS": 1,
+        "MORPH_ITERATIONS": 1,
+        "DILATE_KERNEL_SIZE": np.ones((1, 1), np.uint8),
+        "DILATE_ITERATIONS": 0,
+        "CLIP_LIMIT": 0.8,
         # find object
         "MIN_AREA": 35000,
         "INNER_AREA": 1000,
@@ -54,7 +48,7 @@ PREDEFINED_CONFIGS = {
         "MIN_SCALE_AREA": 100000,
         # size prediction
         "DILATE_ADAPTATION": 0.2,
-         "IMG_H_PADDING": 300,
-        "IMG_W_PADDING": 200
+        "IMG_H_PADDING": 400,
+        "IMG_W_PADDING": 300
     },
 }
