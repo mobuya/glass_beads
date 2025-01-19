@@ -65,17 +65,21 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
     smallest_contr = None
     inner_contour = None
 
+    #temp_img = original_image.copy()
     MIN_AREA = configuration["MIN_AREA"] 
     INNER_AREA_LIMIT = configuration["INNER_AREA"]
 
     area_limit = (image_h * image_w) / 3  # look into this maybe
 
     for idx, contour in enumerate(contours):
-        area = cv2.contourArea(contour)
+        #area = cv2.contourArea(contour)
+        rect = cv2.boundingRect(contour)
+        x,y,w,h = rect
+        area = w * h
         if hierarchy[0][idx][3] == -1:  
             if area >= MIN_AREA:
                 x, y, _, _ = cv2.boundingRect(contour)
-                if y < (image_h * 0.8) and x < (image_w * 0.5) and area < area_limit:  # check position and area size
+                if y < (image_h * 0.8) and x < (image_w * 0.5) and area < area_limit:  
 
                     mask = np.zeros(threshold_image.shape, dtype=np.uint8)
                     cv2.drawContours(mask, [contour], -1, 255, -1)
@@ -86,12 +90,12 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
                         continue  
 
                     if not clahe:
-                        if np.allclose(mean_color, background_color, atol=60):
+                        if np.allclose(mean_color, background_color, atol=60): 
                             print(f"This one is with a tolerance 60 similar to the background: trying with different threshold function")
                             return find_artifact_contour(original_image, bead_view, configuration, thr_value, hole_similarity, clahe=True)  
                                            
                     smallest_contr = contour
-
+                    
                     for sub_index, sub_contour in enumerate(contours):
                         if hierarchy[0][sub_index][3] == idx and bead_view == 'B':
                             inner_area = cv2.contourArea(sub_contour)
@@ -104,9 +108,9 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
                                 if np.allclose(inner_mean_color, background_color, atol = hole_similarity):  
                                     inner_contour = sub_contour
                                     break
-
+            
                     break
-                
+
     if smallest_contr is not None:
         print('Artifact contour found.')
     else:

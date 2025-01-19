@@ -1,7 +1,7 @@
 import cv2
 
 
-def enhance_and_threshold(image, configuration, threshold_value = 223, CLAHE_BOOL = False):
+def enhance_and_threshold(image, configuration, threshold_value = 223, CLAHE_BOOL = False):  # thr value is 223
     '''
     Enhances and thresholds an input image to improve contour detection for object segmentation.  
     The function optionally applies Contrast Limited Adaptive Histogram Equalization (CLAHE), followed by thresholding, morphological closing, and dilation to smooth object outline.
@@ -39,12 +39,13 @@ def enhance_and_threshold(image, configuration, threshold_value = 223, CLAHE_BOO
     MORPH_ITERATIONS = configuration["MORPH_ITERATIONS"]
     DILATE_KERNEL_SIZE = configuration["DILATE_KERNEL_SIZE"]
     DILATE_ITERATIONS = configuration["DILATE_ITERATIONS"]
+    CLIP_LIMIT = configuration["CLIP_LIMIT"]
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)  
     img = cv2.medianBlur(gray, 5)
 
     if CLAHE_BOOL:
-        clahe = cv2.createCLAHE(clipLimit=0.9, tileGridSize=(8, 8))
+        clahe = cv2.createCLAHE(clipLimit=CLIP_LIMIT, tileGridSize=(8, 8))   # clahe for full size is 0.9 and 8,8 
         enhanced_image = clahe.apply(img)
         _, threshold_image = cv2.threshold(enhanced_image, threshold_value, 255, cv2.THRESH_BINARY_INV)
     else:   
