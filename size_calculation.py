@@ -1,4 +1,9 @@
 import cv2
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
+
 
  
 def get_horizontal_dimension(pearl_contour, pixel_metric, configuration):
@@ -22,19 +27,19 @@ def get_horizontal_dimension(pearl_contour, pixel_metric, configuration):
         The width of the pearl in millimeters, adjusted for dilation, rounded to one decimal place.
         Returns 0.0 if the scale or pearl contour is missing.
     '''
+    # cannot reach these conditions because these values are checked before the function is called: but just to be safe
     if pixel_metric is None:
-        print('The scale contour could not be calculated.')
+        logger.warning(f"No valid scale contour to be used for size calculation.")
         return 0.0        
     if pearl_contour is None:
-        print('No valid contour found for size prediction.')
-        return 0.0 # TODO: Logging, error handling 
+        logger.warning(f"No valid object contour to be used for size calculation.")
+        return 0.0  
 
     _, _, w, _ = cv2.boundingRect(pearl_contour)
     
     measured_width = w / pixel_metric  
 
-    
-    DILATE_ADAPTATION = configuration["DILATE_ADAPTATION"]   # TODO: THIS DEPENDS ALSO ON THE IMAGE RESOLUTION
+    DILATE_ADAPTATION = configuration["DILATE_ADAPTATION"] 
 
     measured_width = measured_width - DILATE_ADAPTATION
     measured_width = round(measured_width, 1)

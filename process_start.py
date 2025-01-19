@@ -7,9 +7,13 @@ from config_manager import config_context
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
-
 from color_converter import convert_for_xlsx
 from crop_and_measure import process_bead_data
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
+
 
 
 
@@ -27,7 +31,7 @@ MERGE = False
 TRANSPARENT = True
 ORIGINAL_SCALE_SIZE_mm = 50 
 
-GET_ALL_VIEW_COLOR = True
+GET_ALL_VIEW_COLOR = False
 # *************** 
 
 start_time = datetime.now() # i use this jus to measure time
@@ -68,15 +72,15 @@ for filename in os.listdir(UPLOAD_FOLDER):
 
         object_dictionary[pearl_id][pearl_view] = file_path
     else:
-        print('Format not supported! Allowed formats are: jpg, jpeg and png.') # TODO: Logging
+        logger.info(f"Format is not supported for {filename}, the allowed types are: {ALLOWED_FILE_TYPES}")
 
 
 output_path = OUTPUT_FOLDER_NAME
 while os.path.exists(output_path):
-        print(f"Folder {output_path} already exists!") # TODO: Logging
+        logger.info(f"A folder with the name {output_path} already exists, created new one appending {output_counter} to folder name.")
         output_path = OUTPUT_FOLDER_NAME + f"_{output_counter}"
         output_counter += 1
-os.makedirs(output_path) # this creates the output dictionary 
+os.makedirs(output_path) 
 
 
 workbook = Workbook()
@@ -86,16 +90,12 @@ sheet.title = "Pearl Data"
 
 # sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 COLOR','#2 RGB', '#3 COLOR','#3 RGB'])
 
+sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', 'VIEW', '# # #', 'RBG'])
+
 '''
 DISCLAIMER: The color function for now only looks at view A, i need to change this, it will be later done, i will send you all that when im done, but i dont think it will impact your code much. 
 But just info to be sure :)
 '''
-
-if GET_ALL_VIEW_COLOR:
-     sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', 'VIEW', '# # #', 'RBG'])
-     print('hmm')
-else:
-     sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 COLOR','#2 RGB', '#3 COLOR','#3 RGB'])
 
 for pearl_id, views in object_dictionary.items():  # this loops through the dictionary, it goes PER bead_id
     processed_images = {}
@@ -109,18 +109,25 @@ for pearl_id, views in object_dictionary.items():  # this loops through the dict
 
     try:
         with config_context(main_path) as config:
+                if config is None:
+                     logger.warning(f"For the bead: {pearl_id} the processing had to be skipped because the config manager yield None.")
+                     continue
+                
+                logger.info(f"Processing bead: {pearl_id}")
                 processed_images, obj_len, obj_width, colors = process_bead_data(required_views, config, MERGE, TRANSPARENT, ORIGINAL_SCALE_SIZE_mm) # this does alllll the work, you can look into the file if you want more info
-                #rgb_values = []
-                #cell_fills = []
+
                 '''
                 Basically it returns the merged image or single images of each view of the bead, and the beads dimensions
                 Later the processed_images gets looped, it is also a dictionary containing the ID of the output image and the result image.
                 Those then get saved in the output path.
                 '''
-                for id, image in processed_images.items(): 
-                    output_image_path = os.path.join(output_path, f"{id}.png")
-                    cv2.imwrite(output_image_path, image)
-                    print('Saved: ', output_image_path)
+                if len(processed_images.keys()) == 0:
+                     logger.info(f"For bead {pearl_id} no processed images saved (!!!)")
+                else:
+                    for id, image in processed_images.items(): 
+                        output_image_path = os.path.join(output_path, f"{id}.png")
+                        cv2.imwrite(output_image_path, image)
+                        print('Saved: ', output_image_path)
                 
                 # this all is the data for the XLSx file 
                 wA_str = f"{obj_len:.2f}".replace('.', ',')
@@ -128,48 +135,40 @@ for pearl_id, views in object_dictionary.items():  # this loops through the dict
 
                 row = [pearl_id, wA_str, wB_str]
                 sheet.append(row)
+                
+                if colors is None:
+                     colors["INVALID"] = (0, 0, 0)  # check this 
 
                 current_col = 4 
-                if GET_ALL_VIEW_COLOR:
-                    for view, all_colors in colors.items():
-                            #rgb_values, cell_fills = convert_for_xlsx([all_colors[0]])
-                            #rgb_values, cell_fills = convert_for_xlsx(all_colors)
-                            rgb_values, cell_fills = convert_for_xlsx([all_colors[1]])
-                            row_index = sheet.max_row
+                if not GET_ALL_VIEW_COLOR:
+                     view = list(colors.keys())[0]
+                     dict_colors = list(colors.values())[0]
+                     colors = {}
+                     colors[view] = dict_colors
 
-                            for i, (label, fill, rgb) in enumerate(zip([f"{view} COL1:", f"{view} COL2:", f"{view} COL3:"],
-                                                                    cell_fills,
-                                                                    rgb_values)):
-                                sheet[f"{get_column_letter(current_col)}{row_index}"] = label
-                                current_col += 1
-                                sheet[f"{get_column_letter(current_col)}{row_index}"].fill = fill
-                                current_col += 1
-                                sheet[f"{get_column_letter(current_col)}{row_index}"] = rgb
-                                current_col += 1           
-                else:
-                    main_color = list(colors.values())[0]
-                    rgb_values, cell_fills = convert_for_xlsx(main_color)
-                
-                    row_index = sheet.max_row
-                    
-                    sheet[f"D{row_index}"].fill = cell_fills[0]
-                    sheet[f"E{row_index}"] = rgb_values[0]
+                for view, all_colors in colors.items():
+                        #rgb_values, cell_fills = convert_for_xlsx([all_colors[0]])
+                        #rgb_values, cell_fills = convert_for_xlsx(all_colors)
+                        rgb_values, cell_fills = convert_for_xlsx([all_colors[1]])
+                        row_index = sheet.max_row
 
-                    sheet[f"F{row_index}"].fill = cell_fills[1]
-                    sheet[f"G{row_index}"] = rgb_values[1]
+                        for i, (label, fill, rgb) in enumerate(zip([f"{view} COL1:", f"{view} COL2:", f"{view} COL3:"],
+                                                                cell_fills,
+                                                                rgb_values)):
+                            sheet[f"{get_column_letter(current_col)}{row_index}"] = label
+                            current_col += 1
+                            sheet[f"{get_column_letter(current_col)}{row_index}"].fill = fill
+                            current_col += 1
+                            sheet[f"{get_column_letter(current_col)}{row_index}"] = rgb
+                            current_col += 1           
 
-                    sheet[f"H{row_index}"].fill = cell_fills[2]
-                    sheet[f"I{row_index}"] = rgb_values[2]
-
-                print(f"Saved data for {pearl_id}")
-    except ValueError as e:
-        print(e)
+                logger.info(f"Finished processing bead: {pearl_id}.")
+    except Exception as e:
+        logger.error(f"Error while processing: {pearl_id}: {e}")
 
 # join paths 
-workbook.save(XLSX_FILE)
 workbook.save(os.path.join(output_path, XLSX_FILE))
 
 end_time = datetime.now()
 
-print('Done!')
 print('Duration: {}'.format(end_time - start_time))

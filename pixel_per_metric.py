@@ -4,7 +4,11 @@ from enhance_threshold import enhance_and_threshold
 from imutils import perspective
 from scipy.spatial import distance as dist
 from find_object import get_background_color
- 
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
+
 
 template_path = "fitted_color_palette.png"
 
@@ -65,7 +69,7 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180)
     If this also results in no contour, either the scale is not present or the image has an invalid format for this tool.
     '''
     if scale_contour is None:
-        print('Inside the new function that removes the color palette if the scale is not found.') # TODO: Logging
+        logger.info(f"Inside the template matching function since the original function could not find a valid scale contour.")
         bg_color = get_background_color(original_image)
         template = cv2.imread(template_path,cv2.IMREAD_GRAYSCALE)
         best_method = 'TM_CCOEFF_NORMED'  # robust against light and some other invariance 
@@ -109,7 +113,7 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180)
 
         pixel_metric = scale_width / known_scale_length
     else:
-        print('There is no scale on this image bruv.') # TODO: Error handling, logging, save the ID where no scale present
+        logger.warning("Failed to find the scale outline on image!")
 
        
     return pixel_metric

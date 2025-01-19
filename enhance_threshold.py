@@ -45,7 +45,7 @@ def enhance_and_threshold(image, configuration, threshold_value = 223, CLAHE_BOO
     img = cv2.medianBlur(gray, 5)
 
     if CLAHE_BOOL:
-        clahe = cv2.createCLAHE(clipLimit=CLIP_LIMIT, tileGridSize=(8, 8))   # clahe for full size is 0.9 and 8,8 
+        clahe = cv2.createCLAHE(clipLimit=CLIP_LIMIT, tileGridSize=(8, 8)) 
         enhanced_image = clahe.apply(img)
         _, threshold_image = cv2.threshold(enhanced_image, threshold_value, 255, cv2.THRESH_BINARY_INV)
     else:   

@@ -6,7 +6,10 @@ from find_object import find_artifact_contour
 from size_calculation import get_horizontal_dimension
 from pixel_per_metric import calculate_ppm
 from color_extraction import get_dominant_color
+import logging
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
 
 
 def process_bead_data(paths, config, merge, transparent, scale_size):
@@ -67,7 +70,13 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
         bead_id, full_bead_view =  parse_bead_id_and_view(parse_filename_from_path(path))
         bead_view = 'A' if "A" in full_bead_view else 'B'
         
+        
         original_image = cv2.imread(path)
+
+        if original_image is None:
+            logger.warning(f"The needed image could not be opened: {path}, so the bead {bead_id} had to be skipped")
+            continue
+
         # RESIZING DONE HERE PT 1
         #original_image = cv2.resize( original_image, (6000, 4000))
         #original_image = cv2.resize( original_image, (6600, 4400))
@@ -79,24 +88,24 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
         artifact_contour, inner_contour = find_artifact_contour(original_image, bead_view, config) 
     
         if artifact_contour is None:
-            # TODO: Error handling, logging
-            print(f"For image no artifact was found; thus cant segment nor predict size: {path}")
+            logger.info(f"I M P O R T A N T: The image of bead {bead_id} could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.")
             continue
         
 
         bead_color = get_dominant_color(original_image, artifact_contour, inner_contour)
         all_colors[full_bead_view] = bead_color
 
-        object_width = get_horizontal_dimension(artifact_contour, ppm, config) 
+        if ppm is None:
+            logger.info(f"For bead {bead_id}, view {bead_view} the ppm ratio could not be calculate; thus no valid size calculation.")
+            object_width = 0.0
+        else:
+            object_width = get_horizontal_dimension(artifact_contour, ppm, config) 
 
         if object_width != 0.0:
             if bead_view == 'A':
                 length_viewA.append(object_width)
             else:
-                width_viewB.append(object_width) 
-        else:
-            print('The scale contour wasnt detected so the object couldnt be measured') # TODO: logging
-         
+                width_viewB.append(object_width)      
 
         if merge:
             output_file = bead_id

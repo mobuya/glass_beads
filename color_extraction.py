@@ -1,6 +1,11 @@
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
+
 
 
 '''
@@ -47,12 +52,12 @@ def get_dominant_color(img, contour, inner_contour = None, nr_colors=3, nr_iter=
 
     Notes
     -----
-    - If no contour is provided, the function prints a warning and returns `None`. !!!!!!!!!!!!!!!!!!!!!!!! 
+    - If no contour is provided, the function logs an info and returns `None`. 
     '''  
 
     if contour is None:
-        print('No contour found: contour function could not be called.')
-        return None  # TODO: Error handling here 
+        logger.info(f"Function received no contour.") # this is not possible since already in the main function it is checked for valid contours
+        return None 
 
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     mask = np.zeros(img.shape[:2], dtype=np.uint8)

@@ -1,6 +1,10 @@
 import cv2
 import numpy as np
 from find_object import THR_VALUE
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
 
 
 '''
@@ -40,11 +44,11 @@ def place_obj_on_background(images, out_contours, in_contours, transparent, conf
     '''
     #TODO: Error handling and logging
     if len(images) != len(out_contours):
-        print('paths and contours dont match!')
+        logger.warning("The number of images and outer contours dont match: no object placement possible.")
         return
     
     if len(images) != len(in_contours):
-        print('paths and inner contours dont match!') 
+        logger.warning("The number of images and inner contours dont match: no object placement possible.") 
         return
 
     object_sizes = [(cv2.boundingRect(c)[2], cv2.boundingRect(c)[3]) for c in out_contours]

@@ -1,6 +1,10 @@
 import cv2
 import numpy as np
 from enhance_threshold import enhance_and_threshold
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
 
 
 THR_VALUE = 223  
@@ -86,12 +90,13 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
                     mean_color = cv2.mean(original_image, mask=mask)[:3]  
                     
                     if np.allclose(mean_color, background_color, atol=BACKGROUND_SIMILARITY_TOLERANCE):
-                        print('A contour was detected but was too close to the background; thus it was skipped')
+                        logger.info("A contour was detected but it's color was too similar to the background; thus it was skipped")
                         continue  
 
                     if not clahe:
                         if np.allclose(mean_color, background_color, atol=60): 
-                            print(f"This one is with a tolerance 60 similar to the background: trying with different threshold function")
+                            logger.info(f"A contour was detected which color is similar too background; called new thresholding function to get cleaner outline.")
+                            logger.info(f"IMPORTANT: check the output for this bead, since there might be a chance the output is not clean (!!!)")
                             return find_artifact_contour(original_image, bead_view, configuration, thr_value, hole_similarity, clahe=True)  
                                            
                     smallest_contr = contour
@@ -111,19 +116,17 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
             
                     break
 
-    if smallest_contr is not None:
-        print('Artifact contour found.')
-    else:
+
+    if smallest_contr is None:
         if thr_value != 160:
             new_thr_value = 160
             NEW_HOLE_SIMILARITY_TOLERANCE = 25 
+            logger.info(f"No bead outline found: calling the function once again with a threshold value of 160.")
             return find_artifact_contour(original_image, bead_view,configuration, new_thr_value, NEW_HOLE_SIMILARITY_TOLERANCE) 
-        # TODO: Error handling 
-    
-        
+
+            
     return smallest_contr, inner_contour
     
-# TODO: Logging in above function, save IDs of pearls where clahe was set to true so the user can check those beads since the output may not be clean.
 
 def get_background_color(image):
     '''
