@@ -1,14 +1,15 @@
 import os
 import cv2
-import shutil
 import numpy as np
 from datetime import datetime
 from id_parser import parse_bead_id_and_view
 from config_manager import config_context
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill
+from openpyxl.utils import get_column_letter
+
 from color_converter import convert_for_xlsx
-from crop_and_measure import crop_artifact_and_measure
+from crop_and_measure import process_bead_data
 
 
 
@@ -22,15 +23,17 @@ This is the MAIN file, this is where everything starts and everything gets done!
 '''
 These are all the web user inputs!
 '''
-MERGE = True  
+MERGE = False  
 TRANSPARENT = True
 ORIGINAL_SCALE_SIZE_mm = 50 
 
+GET_ALL_VIEW_COLOR = True
 # *************** 
 
 start_time = datetime.now() # i use this jus to measure time
 
-UPLOAD_FOLDER = 'upload_images/' 
+UPLOAD_FOLDER = 'combine_all/' 
+#UPLOAD_FOLDER = 'pearls_to_segment/' 
 OUTPUT_FOLDER_NAME = 'processed_pearl_output'
 output_counter = 1  # this just helps in cae the output folder was not renamed, to just create a new one, to avoid overwriting the existing one
 
@@ -80,13 +83,19 @@ workbook = Workbook()
 sheet = workbook.active
 
 sheet.title = "Pearl Data"
-sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 COLOR','#2 RGB', '#3 COLOR','#3 RGB'])
+
+# sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 COLOR','#2 RGB', '#3 COLOR','#3 RGB'])
 
 '''
 DISCLAIMER: The color function for now only looks at view A, i need to change this, it will be later done, i will send you all that when im done, but i dont think it will impact your code much. 
 But just info to be sure :)
 '''
 
+if GET_ALL_VIEW_COLOR:
+     sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', 'VIEW', '# # #', 'RBG'])
+     print('hmm')
+else:
+     sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 COLOR','#2 RGB', '#3 COLOR','#3 RGB'])
 
 for pearl_id, views in object_dictionary.items():  # this loops through the dictionary, it goes PER bead_id
     processed_images = {}
@@ -100,9 +109,9 @@ for pearl_id, views in object_dictionary.items():  # this loops through the dict
 
     try:
         with config_context(main_path) as config:
-                processed_images, obj_len, obj_width, colors = crop_artifact_and_measure(required_views, config, MERGE, TRANSPARENT, ORIGINAL_SCALE_SIZE_mm) # this does alllll the work, you can look into the file if you want more info
-                rgb_values = []
-                cell_fills = []
+                processed_images, obj_len, obj_width, colors = process_bead_data(required_views, config, MERGE, TRANSPARENT, ORIGINAL_SCALE_SIZE_mm) # this does alllll the work, you can look into the file if you want more info
+                #rgb_values = []
+                #cell_fills = []
                 '''
                 Basically it returns the merged image or single images of each view of the bead, and the beads dimensions
                 Later the processed_images gets looped, it is also a dictionary containing the ID of the output image and the result image.
@@ -117,24 +126,49 @@ for pearl_id, views in object_dictionary.items():  # this loops through the dict
                 wA_str = f"{obj_len:.2f}".replace('.', ',')
                 wB_str = f"{obj_width:.2f}".replace('.', ',')
 
-                if colors is not None:
-                    rgb_values, cell_fills = convert_for_xlsx(colors)
-
-                row = [pearl_id, wA_str, wB_str, ' ', rgb_values[0], ' ', rgb_values[1], ' ', rgb_values[2]]
+                row = [pearl_id, wA_str, wB_str]
                 sheet.append(row)
-                row_index = sheet.max_row
+
+                current_col = 4 
+                if GET_ALL_VIEW_COLOR:
+                    for view, all_colors in colors.items():
+                            #rgb_values, cell_fills = convert_for_xlsx([all_colors[0]])
+                            #rgb_values, cell_fills = convert_for_xlsx(all_colors)
+                            rgb_values, cell_fills = convert_for_xlsx([all_colors[1]])
+                            row_index = sheet.max_row
+
+                            for i, (label, fill, rgb) in enumerate(zip([f"{view} COL1:", f"{view} COL2:", f"{view} COL3:"],
+                                                                    cell_fills,
+                                                                    rgb_values)):
+                                sheet[f"{get_column_letter(current_col)}{row_index}"] = label
+                                current_col += 1
+                                sheet[f"{get_column_letter(current_col)}{row_index}"].fill = fill
+                                current_col += 1
+                                sheet[f"{get_column_letter(current_col)}{row_index}"] = rgb
+                                current_col += 1           
+                else:
+                    main_color = list(colors.values())[0]
+                    rgb_values, cell_fills = convert_for_xlsx(main_color)
                 
-                sheet[f"D{row_index}"].fill = cell_fills[0]
-                sheet[f"F{row_index}"].fill = cell_fills[1]
-                sheet[f"H{row_index}"].fill = cell_fills[2]
+                    row_index = sheet.max_row
+                    
+                    sheet[f"D{row_index}"].fill = cell_fills[0]
+                    sheet[f"E{row_index}"] = rgb_values[0]
+
+                    sheet[f"F{row_index}"].fill = cell_fills[1]
+                    sheet[f"G{row_index}"] = rgb_values[1]
+
+                    sheet[f"H{row_index}"].fill = cell_fills[2]
+                    sheet[f"I{row_index}"] = rgb_values[2]
 
                 print(f"Saved data for {pearl_id}")
     except ValueError as e:
         print(e)
 
 # join paths 
-#workbook.save(XLSX_FILE)
+workbook.save(XLSX_FILE)
 workbook.save(os.path.join(output_path, XLSX_FILE))
+
 end_time = datetime.now()
 
 print('Done!')

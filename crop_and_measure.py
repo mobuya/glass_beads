@@ -9,7 +9,7 @@ from color_extraction import get_dominant_color
 
 
 
-def crop_artifact_and_measure(paths, config, merge, transparent, scale_size):
+def process_bead_data(paths, config, merge, transparent, scale_size):
     '''
     Processes a list of image paths to segment, crop, and measure artifacts (beads) from images.  
     The function extracts contours, calculates object dimensions, and optionally merges multiple views into a single image.
@@ -57,21 +57,26 @@ def crop_artifact_and_measure(paths, config, merge, transparent, scale_size):
     processed_images = {}
     length_viewA = []
     width_viewB = []
-    all_dom_colors = []
+    all_colors = {}
 
     out_contours = []
     in_contours = []
     images = []
 
     for path in paths:
-        pearl_id, pearl_view =  parse_bead_id_and_view(parse_filename_from_path(path))
-        pearl_view = 'A' if "A" in pearl_view else 'B'
+        bead_id, full_bead_view =  parse_bead_id_and_view(parse_filename_from_path(path))
+        bead_view = 'A' if "A" in full_bead_view else 'B'
         
         original_image = cv2.imread(path)
+        # RESIZING DONE HERE PT 1
+        #original_image = cv2.resize( original_image, (6000, 4000))
+        #original_image = cv2.resize( original_image, (6600, 4400))
+        #original_image = cv2.resize( original_image, (7000, 4667))
+        #original_image = cv2.resize( original_image, (7500, 5000))
 
         ppm = calculate_ppm(original_image, scale_size, config)
 
-        artifact_contour, inner_contour = find_artifact_contour(original_image, pearl_view, config) 
+        artifact_contour, inner_contour = find_artifact_contour(original_image, bead_view, config) 
     
         if artifact_contour is None:
             # TODO: Error handling, logging
@@ -79,22 +84,23 @@ def crop_artifact_and_measure(paths, config, merge, transparent, scale_size):
             continue
         
 
-        all_colors = get_dominant_color(original_image, artifact_contour)
+        bead_color = get_dominant_color(original_image, artifact_contour, inner_contour)
+        all_colors[full_bead_view] = bead_color
+
         object_width = get_horizontal_dimension(artifact_contour, ppm, config) 
 
         if object_width != 0.0:
-            if pearl_view == 'A':
+            if bead_view == 'A':
                 length_viewA.append(object_width)
             else:
                 width_viewB.append(object_width) 
         else:
             print('The scale contour wasnt detected so the object couldnt be measured') # TODO: logging
-
-        if pearl_view == 'A':
-                all_dom_colors.append(np.array(all_colors))  
+         
 
         if merge:
-            output_file = pearl_id
+            output_file = bead_id
+
             images.append(original_image)
             out_contours.append(artifact_contour) 
             in_contours.append(inner_contour)
@@ -110,8 +116,5 @@ def crop_artifact_and_measure(paths, config, merge, transparent, scale_size):
     final_object_length = round(sum(length_viewA) / len(length_viewA), 1) if length_viewA else 0.0
     final_object_width = round(sum(width_viewB) / len(width_viewB), 1) if width_viewB else 0.0
 
-    dom_color = all_dom_colors[0] if all_dom_colors else None
 
-
-    return processed_images, final_object_length, final_object_width, dom_color
-
+    return processed_images, final_object_length, final_object_width, all_colors
