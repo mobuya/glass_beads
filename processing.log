@@ -1,0 +1,26 @@
+2025-01-20 19:03:31,068 - INFO - A folder with the name processed_pearl_output already exists, created new one appending 1 to folder name.
+2025-01-20 19:03:31,068 - INFO - A folder with the name processed_pearl_output_1 already exists, created new one appending 2 to folder name.
+2025-01-20 19:03:31,069 - INFO - A folder with the name processed_pearl_output_2 already exists, created new one appending 3 to folder name.
+2025-01-20 19:03:31,069 - INFO - A folder with the name processed_pearl_output_3 already exists, created new one appending 4 to folder name.
+2025-01-20 19:03:31,598 - INFO - Processing bead: ENZFSCH_333_001
+2025-01-20 19:03:41,858 - INFO - Finished processing bead: ENZFSCH_333_001.
+2025-01-20 19:03:42,340 - INFO - Processing bead: ENZFSCH_333_020
+2025-01-20 19:03:44,265 - INFO - No bead outline found: calling the function once again with a threshold value of 160.
+2025-01-20 19:03:44,973 - INFO - I M P O R T A N T: The image of bead ENZFSCH_333_020 could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.
+2025-01-20 19:03:44,982 - INFO - For bead ENZFSCH_333_020 no processed images saved (!!!)
+2025-01-20 19:03:44,982 - ERROR - Error in creating the CONFIGURATION object for combine_all/ENZFSCH_333_020_B1.png: list index out of range
+2025-01-20 19:03:44,982 - INFO - Yield None as config for combine_all/ENZFSCH_333_020_B1.png
+2025-01-20 19:03:44,982 - ERROR - Error while processing: ENZFSCH_333_020: generator didn't stop after throw()
+2025-01-20 19:03:45,547 - INFO - Processing bead: ENZFSCH_340_129
+2025-01-20 19:03:53,959 - INFO - Finished processing bead: ENZFSCH_340_129.
+2025-01-20 19:04:38,243 - INFO - Processing bead: ENZFSCH_333_001
+2025-01-20 19:04:48,429 - INFO - Finished processing bead: ENZFSCH_333_001.
+2025-01-20 19:04:48,922 - INFO - Processing bead: ENZFSCH_333_020
+2025-01-20 19:04:50,908 - INFO - No bead outline found: calling the function once again with a threshold value of 160.
+2025-01-20 19:04:51,623 - INFO - I M P O R T A N T: The image of bead ENZFSCH_333_020 could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.
+2025-01-20 19:04:51,625 - INFO - For bead ENZFSCH_333_020 no processed images saved (!!!)
+2025-01-20 19:04:51,625 - ERROR - Error in creating the CONFIGURATION object for combine_all/ENZFSCH_333_020_B1.png: list index out of range
+2025-01-20 19:04:51,625 - INFO - Yield None as config for combine_all/ENZFSCH_333_020_B1.png
+2025-01-20 19:04:51,625 - ERROR - Error while processing: ENZFSCH_333_020: generator didn't stop after throw()
+2025-01-20 19:04:52,184 - INFO - Processing bead: ENZFSCH_340_129
+2025-01-20 19:05:00,357 - INFO - Finished processing bead: ENZFSCH_340_129.

@@ -1,46 +1,40 @@
 import cv2
-from config_manager import config_context
+from config.config_manager import config_context
 import numpy as np
-from imutils import perspective
 from matplotlib import pyplot as plt
-from find_object import get_background_color
-from enhance_threshold import enhance_and_threshold
+from processing import find_artifact_contour
+from processing import get_dominant_color
+from utils import parse_bead_id_and_view
+
+image_path = "combine_all/ENZFSCH_340_129_A.png"
 
 
-#image_path = "combine_all/ENZFSCH_340_015_A.png"
+def plot_img_with_colors(img, colors):
+    n_colors = colors.shape[0]
 
-#image_path = "combine_all/ENZFSCH_340_191_B.png"
-
-#image_path = "combine_all/ENZFSCH_333_026_B.png"
-
-#image_path = "combine_all/ENZFSCH_340_138_A.png"
-#image_path = "combine_all/ENZFSCH_340_017_B1.png"
-
-#image_path = "combine_all/ENZFSCH_340_117_B2.png"
-
-image_path = "upload_images/ENZFSCH_333_009_A.png"
-'''
-clahe works with pearls, that have a nice bright image, didnt trry it with other normal colored pearls, but with darker images it wont work, 
-oopsie, 
-gotta see how it works wit the rest to determine if i should implement it with clahe or not
-'''
+    fig, ax = plt.subplots(1, n_colors + 1)
+    [axi.set_axis_off() for axi in ax.ravel()]
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    ax[0].imshow(img)
+    ax[0].set_title(f"Image with hole")
+    for c_i, c in enumerate(colors):
+        colored_box = np.full(img.shape, c)
+        ax[c_i+1].imshow(colored_box)
+        ax[c_i+1].set_title(f"Color #{c_i+1}")
+    plt.show()
 
 try:
     with config_context(image_path) as config:
-        image = cv2.imread(image_path)
+        if config is None:
+            print('its none')
+            print(2+2)
+        else:
+            image = cv2.imread(image_path)
+            sml_c, in_c = find_artifact_contour(image, 'B', config)
+            dominant_colors = get_dominant_color(image, sml_c, in_c)
+            print(f"Num of dom {len(dominant_colors)}")
 
-        thr_img = enhance_and_threshold(image, config, False, threshold_value=180)
-
-        contours, _ = cv2.findContours(thr_img, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
-
-        for c in contours:
-             if cv2.contourArea(c) > 2500:
-                rect = cv2.boundingRect(c)
-                x,y,w,h = rect
-                cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),10)
-                cv2.drawContours(image, [c], -1, (255, 0, 0), 5)
-
-        cv2.imwrite('test_bool.png', image)
+            plot_img_with_colors(image, dominant_colors)
 
 except ValueError as e:
         print(e) 
