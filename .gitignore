@@ -6,4 +6,7 @@ opencvenv/
 
 
 #Ignore output folder
- processed_bead_output/
+processed_bead_output/
+segmented_pearls_output/
+upload_images/
+combine_all/
