@@ -4,10 +4,6 @@ __pycache__/
 # Ignore virtual environment
 opencvenv/
 
-# Ignore temporary images
-*.png 
-*.jpg 
-*.jpeg
 
 #Ignore output folder
- processed_pearl_output/
+ processed_bead_output/
