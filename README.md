@@ -21,6 +21,8 @@ Example image:
 - Saves output to zip and xlsx file. (not yet fully done!)
 
 
+## Add versions of other packages used!
+
 ##  Installation
 
 1. Clone the repository
