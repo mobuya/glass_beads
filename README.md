@@ -1,37 +1,53 @@
-## About the Project
+# Bead Processing Tool for Archaeology
 
-OpenCV version: 4.9.0
+This tool contains functions for processing, measuring and analyzing bead images.
 
-Work in progress for my thesis, consisting of three main parts:
- 1. Bead segmentation: implemented
- 2. Size prediction: implemented
- 3. Web interface: not yet implemented
+To use this tool it has to follow a specific format:
+- the image HAS to have a resolution >= 6000 x 6000
+- place make sure the brightness is equal throughout the whole image (darker exposure will nor produce clean results)
+- the image has to contain the following: a scale at the BOTTOM CENTER of the image, either 5 or 10 centimeters long
+-  the bead has to be within the image center 
 
-### Files for each task:
-1. Segmentation:
-     - ```enhance_threshold.py``` creates binary threshold image
-     - ```find_object.py``` finds bead contour
-     - ```place_object.py``` places object(s) on transparent or white background
+Example image: 
 
-2. Size prediction:
-   - ```pixel_per_metric.py``` calculates the pixel per metric based on the scale, uses threshold function from above too
-   - ```size_calculation.py``` gets dimension of object with the help of ppm
+* will be here * 
 
-```crop_and_measure.py``` combined all the above into one
 
-3. Color extraction: not yet done the way it should be, work in progress
-    -```crop_and_extraction.py``` with kmeans determines 3 main colors of bead
+## Main Features
+- Calculates bead size and measurements based on contours.
+- Places beads on canvases (single or multiple views).
+- Extracts the dominant color of beads.
+- Supports configuration for different image resolutions.
+- Saves output to zip and xlsx file. (not yet fully done!)
 
-Helpers: 
-  - ```id_parser.py``` saves the beads id and file name from image path
-  - ```constants.py``` saves constant values that are based on image resolution
-  - ```config_manager.py``` determines constant values based on image resolution
-  - ```color_converter.py``` converts color values for XLSX file
 
-The ```process_start.py``` file combines the current progress of segmentation and size prediction, used for smoke tests to see current functionality.
+##  Installation
 
-Missing:
-  - color extraction PER bead view
-  - unit test
-  - segmentation validation (will be done in different project)
-  - web interface
+1. Clone the repository
+2. Move to project directory
+3. Set up virtual environment
+    - ```python -m venv opencvenv```
+4. Install OpenCV (version in project 4.9.0)
+    - ```pip install opencv-python==4.9.0```
+
+
+## Usage
+
+This should maybe be edited, need to see this with Lukas.
+
+1. Place your images in the ```upload_images/```folder.
+2. Run ```python -m core.process_start```
+3. Add input for the following:
+    - if views of a bead should be merged (y/n)
+    - if the background should be transparent (y/n)
+    - the real life size of the scale (5/10)
+
+(About the color analysis too)
+
+The output of the images is then stored in ```processed_bead_output/``` folder where also the ```xlsx``` file can be found with the required bead data.
+
+# IMPORTANT
+
+Each processing will create a ```processing.log```, in here you will find relevant information which bead could not be processed, wether the image resolution was invalid, if the scale could not be detected causing the size measurements to be missing.
+
+One thing I can already tell you, if the beads color is TOO SIMILAR TO THE BACKGROUND color, the processing might not be very clean. Please make sure to check this in your output file. 
