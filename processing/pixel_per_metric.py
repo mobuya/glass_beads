@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
 
 
-template_path = "processing/size_and_color/fitted_color_palette.png"
+template_path = "processing/fitted_color_palette.png"
 
 def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180):
     '''

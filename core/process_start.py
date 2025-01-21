@@ -17,11 +17,6 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
 
 '''
-----> OpenCV version: 4.9.0 (!!!)
-'''
-
-# toggle switch
-'''
 These are all the web user inputs!
 '''
 MERGE = False  
@@ -29,14 +24,14 @@ TRANSPARENT = True
 ORIGINAL_SCALE_SIZE_mm = 50 
 
 GET_ALL_VIEW_COLOR = False
-# *************** 
 
-start_time = datetime.now() # i use this jus to measure time
 
-UPLOAD_FOLDER = 'combine_all/' 
+start_time = datetime.now() 
+
+UPLOAD_FOLDER = 'upload_images/' 
 #UPLOAD_FOLDER = 'pearls_to_segment/' 
 OUTPUT_FOLDER_NAME = 'processed_bead_output'
-output_counter = 1  # this just helps in cae the output folder was not renamed, to just create a new one, to avoid overwriting the existing one
+output_counter = 1 
 
 ALLOWED_FILE_TYPES = ('.jpg', '.jpeg', '.png')
 XLSX_FILE = 'pearl_data_color.xlsx'
@@ -89,35 +84,25 @@ sheet.title = "Pearl Data"
 
 sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', 'VIEW', '# # #', 'RBG'])
 
-'''
-DISCLAIMER: The color function for now only looks at view A, i need to change this, it will be later done, i will send you all that when im done, but i dont think it will impact your code much. 
-But just info to be sure :)
-'''
-
-for pearl_id, views in object_dictionary.items():  # this loops through the dictionary, it goes PER bead_id
+for pearl_id, views in object_dictionary.items():  
     processed_images = {}
     # this is just a placeholder, default value in case the colors couldn't be determined for some reason 
     rgb_values = ["(X, X, X)", "(X, X, X)", "(X, X, X)"]  
     white_fill = PatternFill(start_color='FFFFFFFF', end_color='FFFFFFFF', fill_type="solid")
     cell_fills = [white_fill, white_fill, white_fill]
 
-    required_views = [object_dictionary[pearl_id][v] for v in views] # this just saves all the paths for each view of the bead
-    main_path = required_views[0]  # the first image of the bead is used to determine the configuration
+    required_views = [object_dictionary[pearl_id][v] for v in views]
+    main_path = required_views[0] 
 
     try:
         with config_context(main_path) as config:
                 if config is None:
-                     logger.warning(f"For the bead: {pearl_id} the processing had to be skipped because the config manager yield None.")
-                     continue
+                    logger.warning(f"For the bead: {pearl_id} the processing had to be skipped because the config manager yield None.")
+                    continue
                 
                 logger.info(f"Processing bead: {pearl_id}")
-                processed_images, obj_len, obj_width, colors = process_bead_data(required_views, config, MERGE, TRANSPARENT, ORIGINAL_SCALE_SIZE_mm) # this does alllll the work, you can look into the file if you want more info
+                processed_images, obj_len, obj_width, colors = process_bead_data(required_views, config, MERGE, TRANSPARENT, ORIGINAL_SCALE_SIZE_mm)
 
-                '''
-                Basically it returns the merged image or single images of each view of the bead, and the beads dimensions
-                Later the processed_images gets looped, it is also a dictionary containing the ID of the output image and the result image.
-                Those then get saved in the output path.
-                '''
                 if len(processed_images.keys()) == 0:
                      logger.info(f"For bead {pearl_id} no processed images saved (!!!)")
                 else:
@@ -133,39 +118,35 @@ for pearl_id, views in object_dictionary.items():  # this loops through the dict
                 row = [pearl_id, wA_str, wB_str]
                 sheet.append(row)
                 
-                if colors is None:
-                     colors["INVALID"] = (0, 0, 0)  # check this 
+                if len(list(colors.values())) != 0:
+                    current_col = 4 
+                    if not GET_ALL_VIEW_COLOR:
+                        view = list(colors.keys())[0]
+                        dict_colors = list(colors.values())[0]
+                        colors = {}
+                        colors[view] = dict_colors
 
-                current_col = 4 
-                if not GET_ALL_VIEW_COLOR:
-                     view = list(colors.keys())[0]
-                     dict_colors = list(colors.values())[0]
-                     colors = {}
-                     colors[view] = dict_colors
+                    for view, all_colors in colors.items():
+                            #rgb_values, cell_fills = convert_for_xlsx([all_colors[0]])
+                            #rgb_values, cell_fills = convert_for_xlsx(all_colors)
+                            rgb_values, cell_fills = convert_for_xlsx([all_colors[1]])
+                            row_index = sheet.max_row
 
-                for view, all_colors in colors.items():
-                        #rgb_values, cell_fills = convert_for_xlsx([all_colors[0]])
-                        #rgb_values, cell_fills = convert_for_xlsx(all_colors)
-                        rgb_values, cell_fills = convert_for_xlsx([all_colors[1]])
-                        row_index = sheet.max_row
-
-                        for i, (label, fill, rgb) in enumerate(zip([f"{view} COL1:", f"{view} COL2:", f"{view} COL3:"],
-                                                                cell_fills,
-                                                                rgb_values)):
-                            sheet[f"{get_column_letter(current_col)}{row_index}"] = label
-                            current_col += 1
-                            sheet[f"{get_column_letter(current_col)}{row_index}"].fill = fill
-                            current_col += 1
-                            sheet[f"{get_column_letter(current_col)}{row_index}"] = rgb
-                            current_col += 1           
+                            for i, (label, fill, rgb) in enumerate(zip([f"{view} COL1:", f"{view} COL2:", f"{view} COL3:"],
+                                                                    cell_fills,
+                                                                    rgb_values)):
+                                sheet[f"{get_column_letter(current_col)}{row_index}"] = label
+                                current_col += 1
+                                sheet[f"{get_column_letter(current_col)}{row_index}"].fill = fill
+                                current_col += 1
+                                sheet[f"{get_column_letter(current_col)}{row_index}"] = rgb
+                                current_col += 1           
 
                 logger.info(f"Finished processing bead: {pearl_id}.")
     except Exception as e:
         logger.error(f"Error while processing: {pearl_id}: {e}")
-
-# join paths 
+ 
 workbook.save(os.path.join(output_path, XLSX_FILE))
 
 end_time = datetime.now()
-
 print('Duration: {}'.format(end_time - start_time))

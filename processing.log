@@ -1,26 +1,65 @@
-2025-01-20 19:03:31,068 - INFO - A folder with the name processed_pearl_output already exists, created new one appending 1 to folder name.
-2025-01-20 19:03:31,068 - INFO - A folder with the name processed_pearl_output_1 already exists, created new one appending 2 to folder name.
-2025-01-20 19:03:31,069 - INFO - A folder with the name processed_pearl_output_2 already exists, created new one appending 3 to folder name.
-2025-01-20 19:03:31,069 - INFO - A folder with the name processed_pearl_output_3 already exists, created new one appending 4 to folder name.
-2025-01-20 19:03:31,598 - INFO - Processing bead: ENZFSCH_333_001
-2025-01-20 19:03:41,858 - INFO - Finished processing bead: ENZFSCH_333_001.
-2025-01-20 19:03:42,340 - INFO - Processing bead: ENZFSCH_333_020
-2025-01-20 19:03:44,265 - INFO - No bead outline found: calling the function once again with a threshold value of 160.
-2025-01-20 19:03:44,973 - INFO - I M P O R T A N T: The image of bead ENZFSCH_333_020 could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.
-2025-01-20 19:03:44,982 - INFO - For bead ENZFSCH_333_020 no processed images saved (!!!)
-2025-01-20 19:03:44,982 - ERROR - Error in creating the CONFIGURATION object for combine_all/ENZFSCH_333_020_B1.png: list index out of range
-2025-01-20 19:03:44,982 - INFO - Yield None as config for combine_all/ENZFSCH_333_020_B1.png
-2025-01-20 19:03:44,982 - ERROR - Error while processing: ENZFSCH_333_020: generator didn't stop after throw()
-2025-01-20 19:03:45,547 - INFO - Processing bead: ENZFSCH_340_129
-2025-01-20 19:03:53,959 - INFO - Finished processing bead: ENZFSCH_340_129.
-2025-01-20 19:04:38,243 - INFO - Processing bead: ENZFSCH_333_001
-2025-01-20 19:04:48,429 - INFO - Finished processing bead: ENZFSCH_333_001.
-2025-01-20 19:04:48,922 - INFO - Processing bead: ENZFSCH_333_020
-2025-01-20 19:04:50,908 - INFO - No bead outline found: calling the function once again with a threshold value of 160.
-2025-01-20 19:04:51,623 - INFO - I M P O R T A N T: The image of bead ENZFSCH_333_020 could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.
-2025-01-20 19:04:51,625 - INFO - For bead ENZFSCH_333_020 no processed images saved (!!!)
-2025-01-20 19:04:51,625 - ERROR - Error in creating the CONFIGURATION object for combine_all/ENZFSCH_333_020_B1.png: list index out of range
-2025-01-20 19:04:51,625 - INFO - Yield None as config for combine_all/ENZFSCH_333_020_B1.png
-2025-01-20 19:04:51,625 - ERROR - Error while processing: ENZFSCH_333_020: generator didn't stop after throw()
-2025-01-20 19:04:52,184 - INFO - Processing bead: ENZFSCH_340_129
-2025-01-20 19:05:00,357 - INFO - Finished processing bead: ENZFSCH_340_129.
+2025-01-21 07:40:17,408 - INFO - A folder with the name processed_bead_output already exists, created new one appending 1 to folder name.
+2025-01-21 07:40:17,408 - INFO - A folder with the name processed_bead_output_1 already exists, created new one appending 2 to folder name.
+2025-01-21 07:40:17,408 - INFO - A folder with the name processed_bead_output_2 already exists, created new one appending 3 to folder name.
+2025-01-21 07:40:17,408 - INFO - A folder with the name processed_bead_output_3 already exists, created new one appending 4 to folder name.
+2025-01-21 07:40:17,408 - INFO - A folder with the name processed_bead_output_4 already exists, created new one appending 5 to folder name.
+2025-01-21 07:40:17,408 - INFO - A folder with the name processed_bead_output_5 already exists, created new one appending 6 to folder name.
+2025-01-21 07:40:18,219 - INFO - Processing bead: ENZFSCH_333_020
+2025-01-21 07:40:21,508 - INFO - No bead outline found: calling the function once again with a threshold value of 160.
+2025-01-21 07:40:22,669 - INFO - I M P O R T A N T: The image of bead ENZFSCH_333_020 could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.
+2025-01-21 07:40:22,681 - INFO - For bead ENZFSCH_333_020 no processed images saved (!!!)
+2025-01-21 07:40:22,681 - INFO - Finished processing bead: ENZFSCH_333_020.
+2025-01-21 07:40:23,698 - INFO - Processing bead: ENZFSCH_340_129
+2025-01-21 07:40:27,278 - INFO - Finished processing bead: ENZFSCH_340_129.
+2025-01-21 07:40:27,307 - WARNING - The following image does not provide a high enough resolution to be processed by this tool: upload_images/RESIZED_MPULDF_009_001_B1.png
+2025-01-21 07:40:27,307 - ERROR - Error in creating the CONFIGURATION object for upload_images/RESIZED_MPULDF_009_001_B1.png: Invalid image size!
+2025-01-21 07:40:27,307 - INFO - Yield None as config for upload_images/RESIZED_MPULDF_009_001_B1.png
+2025-01-21 07:40:27,307 - WARNING - For the bead: RESIZED_MPULDF_009_001 the processing had to be skipped because the config manager yield None.
+2025-01-21 07:51:39,903 - INFO - A folder with the name processed_bead_output already exists, created new one appending 1 to folder name.
+2025-01-21 07:51:39,904 - INFO - A folder with the name processed_bead_output_1 already exists, created new one appending 2 to folder name.
+2025-01-21 07:51:39,904 - INFO - A folder with the name processed_bead_output_2 already exists, created new one appending 3 to folder name.
+2025-01-21 07:51:39,904 - INFO - A folder with the name processed_bead_output_3 already exists, created new one appending 4 to folder name.
+2025-01-21 07:51:39,904 - INFO - A folder with the name processed_bead_output_4 already exists, created new one appending 5 to folder name.
+2025-01-21 07:51:39,904 - INFO - A folder with the name processed_bead_output_5 already exists, created new one appending 6 to folder name.
+2025-01-21 07:51:39,904 - INFO - A folder with the name processed_bead_output_6 already exists, created new one appending 7 to folder name.
+2025-01-21 07:51:40,783 - INFO - Processing bead: ENZFSCH_333_001
+2025-01-21 07:51:42,846 - INFO - Inside the template matching function since the original function could not find a valid scale contour.
+2025-01-21 07:51:42,879 - ERROR - Error in creating the CONFIGURATION object for upload_images/ENZFSCH_333_001_A1.png: OpenCV(4.9.0) D:\a\opencv-python\opencv-python\opencv\modules\imgproc\src\templmatch.cpp:588: error: (-215:Assertion failed) corr.rows <= img.rows + templ.rows - 1 && corr.cols <= img.cols + templ.cols - 1 in function 'cv::crossCorr'
+
+2025-01-21 07:51:42,879 - INFO - Yield None as config for upload_images/ENZFSCH_333_001_A1.png
+2025-01-21 07:51:42,879 - ERROR - Error while processing: ENZFSCH_333_001: generator didn't stop after throw()
+2025-01-21 07:51:43,697 - INFO - Processing bead: ENZFSCH_333_020
+2025-01-21 07:51:46,954 - INFO - No bead outline found: calling the function once again with a threshold value of 160.
+2025-01-21 07:51:48,065 - INFO - I M P O R T A N T: The image of bead ENZFSCH_333_020 could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.
+2025-01-21 07:51:48,073 - INFO - For bead ENZFSCH_333_020 no processed images saved (!!!)
+2025-01-21 07:51:48,073 - INFO - Finished processing bead: ENZFSCH_333_020.
+2025-01-21 07:51:48,783 - INFO - Processing bead: ENZFSCH_340_129
+2025-01-21 07:51:51,853 - INFO - Finished processing bead: ENZFSCH_340_129.
+2025-01-21 07:51:51,867 - WARNING - The following image does not provide a high enough resolution to be processed by this tool: upload_images/RESIZED_MPULDF_009_001_B1.png
+2025-01-21 07:51:51,867 - ERROR - Error in creating the CONFIGURATION object for upload_images/RESIZED_MPULDF_009_001_B1.png: Invalid image size!
+2025-01-21 07:51:51,867 - INFO - Yield None as config for upload_images/RESIZED_MPULDF_009_001_B1.png
+2025-01-21 07:51:51,867 - WARNING - For the bead: RESIZED_MPULDF_009_001 the processing had to be skipped because the config manager yield None.
+2025-01-21 07:52:15,824 - INFO - A folder with the name processed_bead_output already exists, created new one appending 1 to folder name.
+2025-01-21 07:52:15,824 - INFO - A folder with the name processed_bead_output_1 already exists, created new one appending 2 to folder name.
+2025-01-21 07:52:15,824 - INFO - A folder with the name processed_bead_output_2 already exists, created new one appending 3 to folder name.
+2025-01-21 07:52:15,824 - INFO - A folder with the name processed_bead_output_3 already exists, created new one appending 4 to folder name.
+2025-01-21 07:52:15,824 - INFO - A folder with the name processed_bead_output_4 already exists, created new one appending 5 to folder name.
+2025-01-21 07:52:15,824 - INFO - A folder with the name processed_bead_output_5 already exists, created new one appending 6 to folder name.
+2025-01-21 07:52:15,824 - INFO - A folder with the name processed_bead_output_6 already exists, created new one appending 7 to folder name.
+2025-01-21 07:52:15,824 - INFO - A folder with the name processed_bead_output_7 already exists, created new one appending 8 to folder name.
+2025-01-21 07:52:16,704 - INFO - Processing bead: ENZFSCH_333_001
+2025-01-21 07:52:18,754 - INFO - Inside the template matching function since the original function could not find a valid scale contour.
+2025-01-21 07:52:21,788 - WARNING - Failed to find the scale outline on image!
+2025-01-21 07:52:23,259 - INFO - For bead ENZFSCH_333_001, view A the ppm ratio could not be calculate; thus no valid size calculation.
+2025-01-21 07:52:23,434 - INFO - Finished processing bead: ENZFSCH_333_001.
+2025-01-21 07:52:24,325 - INFO - Processing bead: ENZFSCH_333_020
+2025-01-21 07:52:26,856 - INFO - No bead outline found: calling the function once again with a threshold value of 160.
+2025-01-21 07:52:27,773 - INFO - I M P O R T A N T: The image of bead ENZFSCH_333_020 could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.
+2025-01-21 07:52:27,784 - INFO - For bead ENZFSCH_333_020 no processed images saved (!!!)
+2025-01-21 07:52:27,784 - INFO - Finished processing bead: ENZFSCH_333_020.
+2025-01-21 07:52:28,514 - INFO - Processing bead: ENZFSCH_340_129
+2025-01-21 07:52:31,798 - INFO - Finished processing bead: ENZFSCH_340_129.
+2025-01-21 07:52:31,813 - WARNING - The following image does not provide a high enough resolution to be processed by this tool: upload_images/RESIZED_MPULDF_009_001_B1.png
+2025-01-21 07:52:31,813 - ERROR - Error in creating the CONFIGURATION object for upload_images/RESIZED_MPULDF_009_001_B1.png: Invalid image size!
+2025-01-21 07:52:31,813 - INFO - Yield None as config for upload_images/RESIZED_MPULDF_009_001_B1.png
+2025-01-21 07:52:31,813 - WARNING - For the bead: RESIZED_MPULDF_009_001 the processing had to be skipped because the config manager yield None.
