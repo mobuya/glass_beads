@@ -23,9 +23,9 @@ Example image:
 
 ## Relevant libraries
 
-NumPy                     1.26.4
-OpenPyXL                  3.1.5
-OpenCV                    4.9.0
+* NumPy                     1.26.4
+* OpenPyXL                  3.1.5
+* OpenCV                    4.9.0
 
 ##  Installation
 
