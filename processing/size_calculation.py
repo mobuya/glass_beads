@@ -1,6 +1,11 @@
 import cv2
 import logging
 
+import numpy as np
+from processing.pixel_per_metric import midpoint
+from imutils import perspective
+from scipy.spatial import distance as dist
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
 
@@ -35,9 +40,19 @@ def get_horizontal_dimension(pearl_contour, pixel_metric, configuration):
         logger.warning(f"No valid object contour to be used for size calculation.")
         return 0.0  
 
-    _, _, w, _ = cv2.boundingRect(pearl_contour)
+    box = cv2.minAreaRect(pearl_contour)
+    box = cv2.boxPoints(box)
+    box = np.array(box, dtype="int")
+    box = perspective.order_points(box)
     
-    measured_width = w / pixel_metric  
+    (tl, tr, br, bl) = box
+    
+    (tlblX, tlblY) = midpoint(tl, bl)
+    (trbrX, trbrY) = midpoint(tr, br)
+        
+    measured_width = dist.euclidean((tlblX, tlblY), (trbrX,trbrY)) 
+
+    measured_width = measured_width / pixel_metric
 
     DILATE_ADAPTATION = configuration["DILATE_ADAPTATION"] 
 

@@ -58,7 +58,7 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180)
     for idx, contour in enumerate(contours):
         area = cv2.contourArea(contour)
         if hierarchy[0][idx][3] == -1 and area > MIN_SCALE_AREA: 
-           x, y, w, h = cv2.boundingRect(contour)
+           x, y, _, _ = cv2.boundingRect(contour)
            if y > (image_h * 0.5):
                scale_contour = contour
                break
@@ -81,6 +81,7 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180)
         _, _, _, max_loc = cv2.minMaxLoc(res)
 
         top_left = max_loc
+        h, w = template.shape
         bottom_right = (top_left[0] + w, top_left[1] + h)
 
         cv2.rectangle(original_image, top_left, bottom_right, bg_color, -1)
@@ -109,7 +110,6 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180)
         (trbrX, trbrY) = midpoint(tr, br)
         
         scale_width = dist.euclidean((tlblX, tlblY), (trbrX,trbrY))
-
         known_scale_length = scale_length 
 
         pixel_metric = scale_width / known_scale_length
