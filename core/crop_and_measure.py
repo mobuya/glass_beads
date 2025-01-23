@@ -87,18 +87,17 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
         artifact_contour, inner_contour = find_artifact_contour(original_image, bead_view, config) 
     
         if artifact_contour is None:
-            logger.info(f"I M P O R T A N T: The image of bead {bead_id} could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.")
+            logger.info(f"I M P O R T A N T: The image of bead {bead_id} ({bead_view}) could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.")
             continue
-        
 
         bead_color = get_dominant_color(original_image, artifact_contour, inner_contour)
         all_colors[full_bead_view] = bead_color
-
+        
         if ppm is None:
-            logger.info(f"For bead {bead_id}, view {bead_view} the ppm ratio could not be calculate; thus no valid size calculation.")
+            logger.info(f"For bead {bead_id}, view {bead_view} the ppm ratio could not be calculated; thus no valid size calculation.")
             object_width = 0.0
         else:
-            object_width = get_horizontal_dimension(artifact_contour, ppm, config) 
+            object_width = get_horizontal_dimension(artifact_contour, ppm, config)
 
         if object_width != 0.0:
             if bead_view == 'A':

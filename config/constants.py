@@ -24,7 +24,7 @@ PREDEFINED_CONFIGS = {
         "CLIP_LIMIT": 0.9,
         # find object
         "MIN_AREA": 45000,
-        "INNER_AREA": 2500,
+        "INNER_AREA": 2900,
         # pixel per metric
         "MIN_SCALE_AREA": 900000,
         # size prediction

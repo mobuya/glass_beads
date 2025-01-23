@@ -22,14 +22,12 @@ These are all the web user inputs!
 MERGE = False  
 TRANSPARENT = True
 ORIGINAL_SCALE_SIZE_mm = 50 
-
 GET_ALL_VIEW_COLOR = False
 
 
 start_time = datetime.now() 
 
-UPLOAD_FOLDER = 'upload_images/' 
-#UPLOAD_FOLDER = 'pearls_to_segment/' 
+UPLOAD_FOLDER = 'upload_images/'
 OUTPUT_FOLDER_NAME = 'processed_bead_output'
 output_counter = 1 
 
@@ -48,11 +46,6 @@ object_dictionary = {
         "B1": "UPLOAD_FOLDER/ENZFSCH_333_001_B1.png",
         "B2": "UPLOAD_FOLDER/ENZFSCH_333_001_B2.png"
     }, etc.. 
-
-The following code reads the values from the UPLOAD_FOLDER and creates this dictionary; it is not saved in a separate function for now, it starts automatically with running this file.  
-    
-    
-    down here
 '''
 for filename in os.listdir(UPLOAD_FOLDER):
     if filename.endswith(ALLOWED_FILE_TYPES):  
@@ -102,7 +95,7 @@ for pearl_id, views in object_dictionary.items():
                 
                 logger.info(f"Processing bead: {pearl_id}")
                 processed_images, obj_len, obj_width, colors = process_bead_data(required_views, config, MERGE, TRANSPARENT, ORIGINAL_SCALE_SIZE_mm)
-
+                colors = {}
                 if len(processed_images.keys()) == 0:
                      logger.info(f"For bead {pearl_id} no processed images saved (!!!)")
                 else:
@@ -125,11 +118,12 @@ for pearl_id, views in object_dictionary.items():
                         dict_colors = list(colors.values())[0]
                         colors = {}
                         colors[view] = dict_colors
+                         
 
                     for view, all_colors in colors.items():
                             #rgb_values, cell_fills = convert_for_xlsx([all_colors[0]])
-                            #rgb_values, cell_fills = convert_for_xlsx(all_colors)
-                            rgb_values, cell_fills = convert_for_xlsx([all_colors[1]])
+                            rgb_values, cell_fills = convert_for_xlsx(all_colors)
+                            #rgb_values, cell_fills = convert_for_xlsx([all_colors[1]])
                             row_index = sheet.max_row
 
                             for i, (label, fill, rgb) in enumerate(zip([f"{view} COL1:", f"{view} COL2:", f"{view} COL3:"],
