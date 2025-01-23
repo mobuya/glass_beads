@@ -3,7 +3,7 @@
 This tool contains functions for processing, measuring and analyzing bead images.
 
 To use this tool it has to follow a specific format:
-- the image HAS to have a resolution >= 6000 x 6000
+- the image HAS to have a resolution >= 6000 x 4000
 - please make sure the brightness is equal throughout the whole image (darker exposure will not produce clean results)
 - the image has to contain the following: a scale at the BOTTOM CENTER of the image, either 5 or 10 centimeters long
 - the bead has to be within the image center
