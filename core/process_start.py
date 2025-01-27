@@ -75,14 +75,10 @@ sheet.title = "Pearl Data"
 
 # sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 COLOR','#2 RGB', '#3 COLOR','#3 RGB'])
 
-sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', 'VIEW', '# # #', 'RBG'])
+sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 COLOR','#2 RGB', '#3 COLOR','#3 RGB'])
 
 for pearl_id, views in object_dictionary.items():  
     processed_images = {}
-    # this is just a placeholder, default value in case the colors couldn't be determined for some reason 
-    rgb_values = ["(X, X, X)", "(X, X, X)", "(X, X, X)"]  
-    white_fill = PatternFill(start_color='FFFFFFFF', end_color='FFFFFFFF', fill_type="solid")
-    cell_fills = [white_fill, white_fill, white_fill]
 
     required_views = [object_dictionary[pearl_id][v] for v in views]
     main_path = required_views[0] 
@@ -95,7 +91,7 @@ for pearl_id, views in object_dictionary.items():
                 
                 logger.info(f"Processing bead: {pearl_id}")
                 processed_images, obj_len, obj_width, colors = process_bead_data(required_views, config, MERGE, TRANSPARENT, ORIGINAL_SCALE_SIZE_mm)
-                colors = {}
+    
                 if len(processed_images.keys()) == 0:
                      logger.info(f"For bead {pearl_id} no processed images saved (!!!)")
                 else:
@@ -108,33 +104,16 @@ for pearl_id, views in object_dictionary.items():
                 wA_str = f"{obj_len:.2f}".replace('.', ',')
                 wB_str = f"{obj_width:.2f}".replace('.', ',')
 
-                row = [pearl_id, wA_str, wB_str]
+                rgb_values, cell_fills = convert_for_xlsx(colors)
+
+                row = [pearl_id, wA_str, wB_str, ' ', rgb_values[0],' ',rgb_values[1],' ', rgb_values[2]]
                 sheet.append(row)
+
+                row_index = sheet.max_row
                 
-                if len(list(colors.values())) != 0:
-                    current_col = 4 
-                    if not GET_ALL_VIEW_COLOR:
-                        view = list(colors.keys())[0]
-                        dict_colors = list(colors.values())[0]
-                        colors = {}
-                        colors[view] = dict_colors
-                         
-
-                    for view, all_colors in colors.items():
-                            #rgb_values, cell_fills = convert_for_xlsx([all_colors[0]])
-                            rgb_values, cell_fills = convert_for_xlsx(all_colors)
-                            #rgb_values, cell_fills = convert_for_xlsx([all_colors[1]])
-                            row_index = sheet.max_row
-
-                            for i, (label, fill, rgb) in enumerate(zip([f"{view} COL1:", f"{view} COL2:", f"{view} COL3:"],
-                                                                    cell_fills,
-                                                                    rgb_values)):
-                                sheet[f"{get_column_letter(current_col)}{row_index}"] = label
-                                current_col += 1
-                                sheet[f"{get_column_letter(current_col)}{row_index}"].fill = fill
-                                current_col += 1
-                                sheet[f"{get_column_letter(current_col)}{row_index}"] = rgb
-                                current_col += 1           
+                sheet[f"D{row_index}"].fill = cell_fills[0]
+                sheet[f"F{row_index}"].fill = cell_fills[1]
+                sheet[f"H{row_index}"].fill = cell_fills[2]
 
                 logger.info(f"Finished processing bead: {pearl_id}.")
     except Exception as e:

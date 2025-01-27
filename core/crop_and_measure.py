@@ -3,7 +3,7 @@ import cv2
 
 from utils import parse_filename_from_path, parse_bead_id_and_view
 from canvas import place_obj_on_background
-from processing import find_artifact_contour, get_horizontal_dimension, calculate_ppm, get_dominant_color
+from processing import find_artifact_contour, get_horizontal_dimension, calculate_ppm, get_dominant_colors
 
 import logging
 
@@ -59,7 +59,6 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
     processed_images = {}
     length_viewA = []
     width_viewB = []
-    all_colors = {}
 
     out_contours = []
     in_contours = []
@@ -90,8 +89,6 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
             logger.info(f"I M P O R T A N T: The image of bead {bead_id} ({bead_view}) could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.")
             continue
 
-        bead_color = get_dominant_color(original_image, artifact_contour, inner_contour)
-        all_colors[full_bead_view] = bead_color
         
         if ppm is None:
             logger.info(f"For bead {bead_id}, view {bead_view} the ppm ratio could not be calculated; thus no valid size calculation.")
@@ -103,14 +100,14 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
             if bead_view == 'A':
                 length_viewA.append(object_width)
             else:
-                width_viewB.append(object_width)      
+                width_viewB.append(object_width)
+
+        images.append(original_image)
+        out_contours.append(artifact_contour) 
+        in_contours.append(inner_contour)      
 
         if merge:
             output_file = bead_id
-
-            images.append(original_image)
-            out_contours.append(artifact_contour) 
-            in_contours.append(inner_contour)
         else:
             output_file = parse_filename_from_path(path)
             canvas = place_obj_on_background([original_image], [artifact_contour], [inner_contour], transparent, config)
@@ -120,8 +117,9 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
         canvas = place_obj_on_background(images, out_contours, in_contours, transparent, config)
         processed_images[output_file] = canvas
 
+
+    dom_colors = get_dominant_colors(images, out_contours, in_contours)
     final_object_length = round(sum(length_viewA) / len(length_viewA), 1) if length_viewA else 0.0
     final_object_width = round(sum(width_viewB) / len(width_viewB), 1) if width_viewB else 0.0
 
-
-    return processed_images, final_object_length, final_object_width, all_colors
+    return processed_images, final_object_length, final_object_width, dom_colors
