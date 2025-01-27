@@ -1,6 +1,6 @@
 # processing/__init__.py
 
-from .color_extraction import get_dominant_color
+from .color_extraction import get_dominant_colors
 from .enhance_threshold import enhance_and_threshold
 from .find_object import get_background_color
 from .find_object import find_artifact_contour
