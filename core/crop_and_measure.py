@@ -5,6 +5,7 @@ import os
 from utils import parse_filename_from_path, parse_bead_id_and_view
 from canvas import place_obj_on_background
 from processing import find_artifact_contour, get_horizontal_dimension, calculate_ppm, get_dominant_colors
+from config import HOLE_VIEW, NO_HOLE_VIEW
 
 import logging
 
@@ -77,7 +78,7 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
 
     for path in paths:
         bead_id, full_bead_view =  parse_bead_id_and_view(parse_filename_from_path(path))
-        bead_view = 'A' if "A" in full_bead_view else 'B'
+        bead_view = NO_HOLE_VIEW if "A" in full_bead_view else HOLE_VIEW
         
         
         original_image = cv2.imread(path)
@@ -111,7 +112,7 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
             object_width = get_horizontal_dimension(artifact_contour, ppm, config)
 
         if object_width != 0.0:
-            if bead_view == 'A':
+            if bead_view == NO_HOLE_VIEW:
                 length_viewA.append(object_width)
             else:
                 width_viewB.append(object_width)

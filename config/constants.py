@@ -13,6 +13,13 @@ IMG_H_PADDING: Horizontal padding added when placing the object on the backgroun
 IMG_W_PADDING: Vertical padding added when placing the object on the background.  
 '''
 
+# *****************
+
+HOLE_VIEW = 'B'
+NO_HOLE_VIEW = 'A'
+
+# ********************
+
 CONFIGURATION = None
 
 PREDEFINED_CONFIGS = {

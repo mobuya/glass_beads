@@ -3,6 +3,8 @@ import numpy as np
 
 from processing import enhance_and_threshold
 from utils import get_background_color
+from config import HOLE_VIEW, NO_HOLE_VIEW
+
 
 import logging
 
@@ -105,7 +107,7 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
                     smallest_contr = contour
                     
                     for sub_index, sub_contour in enumerate(contours):
-                        if hierarchy[0][sub_index][3] == idx and bead_view == 'B':
+                        if hierarchy[0][sub_index][3] == idx and bead_view ==  HOLE_VIEW:
                             inner_area = cv2.contourArea(sub_contour)
                             if inner_area > INNER_AREA_LIMIT:  
                                 
