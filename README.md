@@ -19,7 +19,7 @@ Example image:
 - Places beads on canvases (single or multiple views).
 - Extracts the dominant color of beads.
 - Supports configuration for different image resolutions.
-- Saves output to zip and xlsx file. (not yet fully done!)
+- Saves size calculations and color analysis in a xlsx file, within the output folder.
 
 
 ## Relevant libraries
@@ -40,21 +40,27 @@ Example image:
 
 ## Usage
 
-This should maybe be edited, need to see this with Lukas.
 
 1. Place your images in the ```upload_images/```folder.
-2. Run ```python -m core.process_start```
-3. Add input for the following:
-    - if views of a bead should be merged (y/n)
-    - if the background should be transparent (y/n)
-    - the real life size of the scale (5/10 (cm))
+2. In the ```core.process_start```set the booleans for MERGE and TRANSPARENT to desired output.
+3. Run ```python -m core.process_start```
 
-(About the color analysis too)
 
 The output of the images is then stored in ```processed_bead_output/``` folder where also the ```xlsx``` file can be found with the required bead data.
 
 # IMPORTANT
 
+In case issues occur within processing a bead, those will be stored in the folder ```beads_to_review```!
+
 Each processing will create a ```processing.log```, in here you will find relevant information which bead could not be processed, wether the image resolution was invalid, or if the scale could not be detected causing the size measurements to be missing, etc.
 
-One thing I can already tell you, if the beads color is TOO SIMILAR TO THE BACKGROUND color, the processing might not be very clean. Please make sure to check this in your output file! 
+
+## Testing
+
+Unittest were only created for the key functions:
+
+* config_manager
+* find_object
+* place_object
+* pixel_per_metric
+* size_calculation
