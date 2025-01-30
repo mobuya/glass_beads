@@ -49,6 +49,9 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
 
     inner_contour : numpy.ndarray or None
         The detected inner contour (for pearls with holes, i.e., view B); returns `None` if not found.
+        
+    clahe: bool
+        Indicates if the CLAHE thresholding was called. 
 
     Notes
     -----
@@ -56,7 +59,7 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
       Also changing the hole similarity to 25, since mainly the function is called again if the brightness is too low.
     - IMPORTANT: The function assumes the bead is around the middle of the image, and returns the first found contour that fulfills the following criteria:
         * it's an outer contour
-        * the area is bigger than configuration["MIN_AREA"] and smaller than 1/3 of the image
+        * the area is bigger than configuration["MIN_AREA"] and smaller than 1/3 of the image  - > (area_limit = (image_h * image_w) / 3 )
         * it upper left corner is within the upper 80% of the image height and the left 50% of the image width
 
     !!!
@@ -74,11 +77,10 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
     smallest_contr = None
     inner_contour = None
 
-    #temp_img = original_image.copy()
     MIN_AREA = configuration["MIN_AREA"] 
     INNER_AREA_LIMIT = configuration["INNER_AREA"]
 
-    area_limit = (image_h * image_w) / 3  # look into this maybe
+    area_limit = (image_h * image_w) / 3 
 
     for idx, contour in enumerate(contours):
         #area = cv2.contourArea(contour)
@@ -132,26 +134,3 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
             
     return smallest_contr, inner_contour, clahe
     
-'''
-def get_background_color(image):
-    
-    Estimates the background color of an image by averaging the colors of its four corners.
-    This function works for this tool since the image layout is consistent, thus having clear corners.
-    
-    Parameters
-    ----------
-    image : numpy.ndarray
-        The input image whose background color is to be determined.
-
-    Returns
-    -------
-    background_color : numpy.ndarray
-        The estimated background color as a 3-element array representing the (BGR) color values.
-    
-    corners = [image[0, 0], image[0, -1], image[-1, 0], image[-1, -1]]
-    corner_samples = np.array(corners)
-    
-    background_color = corner_samples.mean(axis=0)
-
-    return background_color
-'''

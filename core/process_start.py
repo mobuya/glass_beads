@@ -10,11 +10,7 @@ from openpyxl import Workbook
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 
-
 import logging
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
 
 '''
 These are all the web user inputs!
@@ -24,15 +20,18 @@ TRANSPARENT = True
 ORIGINAL_SCALE_SIZE_mm = 50 
 GET_ALL_VIEW_COLOR = False
 
+# *************************
 
 start_time = datetime.now() 
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
 
 UPLOAD_FOLDER = 'upload_images/'
 OUTPUT_FOLDER_NAME = 'processed_bead_output'
 output_counter = 1 
 
 ALLOWED_FILE_TYPES = ('.jpg', '.jpeg', '.png')
-XLSX_FILE = 'pearl_data_color.xlsx'
+XLSX_FILE = 'bead_data.xlsx'
 
 object_dictionary = {}  
 
@@ -50,12 +49,12 @@ object_dictionary = {
 for filename in os.listdir(UPLOAD_FOLDER):
     if filename.endswith(ALLOWED_FILE_TYPES):  
         file_path = os.path.join(UPLOAD_FOLDER, filename)
-        pearl_id, pearl_view = parse_bead_id_and_view(filename)
+        bead_id, bead_view = parse_bead_id_and_view(filename)
 
-        if pearl_id not in object_dictionary:
-            object_dictionary[pearl_id] = {}
+        if bead_id not in object_dictionary:
+            object_dictionary[bead_id] = {}
 
-        object_dictionary[pearl_id][pearl_view] = file_path
+        object_dictionary[bead_id][bead_view] = file_path
     else:
         logger.info(f"Format is not supported for {filename}, the allowed types are: {ALLOWED_FILE_TYPES}")
 
@@ -71,29 +70,26 @@ os.makedirs(output_path)
 workbook = Workbook()
 sheet = workbook.active
 
-sheet.title = "Pearl Data"
+sheet.title = "Bead Data"
+sheet.append(['Bead_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 COLOR','#2 RGB', '#3 COLOR','#3 RGB'])
 
-# sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 COLOR','#2 RGB', '#3 COLOR','#3 RGB'])
-
-sheet.append(['PEARL_ID', 'LENGTH (mm)', 'WIDTH (mm)', '#1 COLOR','#1 RGB', '#2 COLOR','#2 RGB', '#3 COLOR','#3 RGB'])
-
-for pearl_id, views in object_dictionary.items():  
+for bead_id, views in object_dictionary.items():  
     processed_images = {}
 
-    required_views = [object_dictionary[pearl_id][v] for v in views]
+    required_views = [object_dictionary[bead_id][v] for v in views]
     main_path = required_views[0] 
 
     try:
         with config_context(main_path) as config:
                 if config is None:
-                    logger.warning(f"For the bead: {pearl_id} the processing had to be skipped because the config manager yield None.")
+                    logger.warning(f"For the bead: {bead_id} the processing had to be skipped because the config manager yield None.")
                     continue
                 
-                logger.info(f"Processing bead: {pearl_id}")
+                logger.info(f"Processing bead: {bead_id}")
                 processed_images, obj_len, obj_width, colors = process_bead_data(required_views, config, MERGE, TRANSPARENT, ORIGINAL_SCALE_SIZE_mm)
     
                 if len(processed_images.keys()) == 0:
-                     logger.info(f"For bead {pearl_id} no processed images saved (!!!)")
+                     logger.info(f"For bead {bead_id} no processed images saved (!!!)")
                 else:
                     for id, image in processed_images.items(): 
                         output_image_path = os.path.join(output_path, f"{id}.png")
@@ -107,7 +103,7 @@ for pearl_id, views in object_dictionary.items():
                 if len(colors) != 0:
                     rgb_values, cell_fills = convert_for_xlsx(colors)
 
-                    row = [pearl_id, wA_str, wB_str, ' ', rgb_values[0],' ', rgb_values[1],' ', rgb_values[2]]
+                    row = [bead_id, wA_str, wB_str, ' ', rgb_values[0],' ', rgb_values[1],' ', rgb_values[2]]
                     sheet.append(row)
 
                     row_index = sheet.max_row
@@ -116,12 +112,12 @@ for pearl_id, views in object_dictionary.items():
                     sheet[f"F{row_index}"].fill = cell_fills[1]
                     sheet[f"H{row_index}"].fill = cell_fills[2]
                 else:
-                    row = [pearl_id, wA_str, wB_str, ' ', 'NO_COLOR']
+                    row = [bead_id, wA_str, wB_str, ' ', 'NO_COLOR']
                     sheet.append(row)
 
-                logger.info(f"Finished processing bead: {pearl_id}.")
+                logger.info(f"Finished processing bead: {bead_id}.")
     except Exception as e:
-        logger.error(f"Error while processing: {pearl_id}: {e}")
+        logger.error(f"Error while processing: {bead_id}: {e}")
  
 workbook.save(os.path.join(output_path, XLSX_FILE))
 

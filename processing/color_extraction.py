@@ -16,36 +16,45 @@ File: colors-glassbeads-clustering.ipynb
 
 
 def get_dominant_colors(images, contours, inner_contours, nr_colors=3, nr_iter=100, eps=300):
-    '''
-    Extracts the dominant colors within a specified contour region of an image using K-Means clustering.
+    """
+    Extracts the dominant colors from a specified region of interest (ROI) in multiple images using K-Means clustering.
+
+    This function segments objects in `images` using `contours` and optionally `inner_contours` to exclude inner areas. 
+    It then extracts and clusters within the segmented regions  using the K-means algorithm the colors, to determine the most dominant colors.
 
     Parameters
     ----------
-    img : numpy.ndarray
-        The input image.
+    images : list of numpy.ndarray
+        A list of input images in BGR format.
 
-    contour : numpy.ndarray
-        The contour defining the region of interest (ROI) from which to extract dominant colors.
+    contours : list of numpy.ndarray
+        A list of contours defining the regions of interest (ROI) in each image.
+
+    inner_contours : list of numpy.ndarray or None
+        A list of optional inner contours to exclude certain regions from color extraction.
+        If `None`, no inner contours are used.
 
     nr_colors : int, optional (default=3)
         The number of dominant colors to extract.
 
-    nr_iter : int, optional (default=10)
+    nr_iter : int, optional (default=100)
         The maximum number of iterations for the K-Means clustering algorithm.
 
-    eps : float, optional (default=10)
+    eps : float, optional (default=300)
         The epsilon value for the K-Means convergence criteria.
 
     Returns
     -------
     col_centers : numpy.ndarray
-        An array of RGB color values representing the dominant colors within the specified contour.
-        The array shape is (nr_colors, 3), where each row corresponds to a dominant color.
+        An array of shape (nr_colors, 3) containing the RGB values of the dominant colors, sorted by intensity.
 
     Notes
     -----
-    - If no contour is provided, the function logs an info and returns `None`. 
-    '''  
+    - The function first extracts the artifact from the image using the provided contours.
+    - A canvas is created to align all extracted objects for color analysis.
+    - The dominant colors are determined using K-Means clustering applied to non-transparent pixels.
+    - The output colors are sorted for consistency.
+    """
 
     object_sizes = [(cv2.boundingRect(c)[2], cv2.boundingRect(c)[3]) for c in contours]
     object_heights = [cv2.boundingRect(c)[3] for c in contours]
@@ -83,8 +92,6 @@ def get_dominant_colors(images, contours, inner_contours, nr_colors=3, nr_iter=1
 
         current_x += w
 
-
-    
     rgb_canvas = canvas[..., :3]
     alpha_channel = canvas[..., 3]
 
@@ -100,5 +107,4 @@ def get_dominant_colors(images, contours, inner_contours, nr_colors=3, nr_iter=1
 
     col_centers = np.sort(col_centers, axis=0)
 
-    
     return col_centers

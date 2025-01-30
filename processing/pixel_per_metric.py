@@ -73,7 +73,7 @@ def calculate_ppm(original_image, scale_length, configuration,  thr_value = 180)
         logger.info(f"Inside the template matching function since the original function could not find a valid scale contour.")
         bg_color = get_background_color(original_image)
         template = cv2.imread(template_path,cv2.IMREAD_GRAYSCALE)
-        best_method = 'TM_CCOEFF_NORMED'  # robust against light and some other invariance 
+        best_method = 'TM_CCOEFF_NORMED'
 
         img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
         method = getattr(cv2, best_method)

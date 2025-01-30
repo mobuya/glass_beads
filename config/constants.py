@@ -15,6 +15,10 @@ IMG_W_PADDING: Vertical padding added when placing the object on the background.
 
 # *****************
 
+'''
+In case the Bead Views labels change, you can change that here
+'''
+
 HOLE_VIEW = 'B'
 NO_HOLE_VIEW = 'A'
 

@@ -12,6 +12,12 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
 
+
+'''
+In case an image can't be processed: no bead contour found, the scale could not be detected or if it the segmentation may not be clean,
+all these get stored in the 'beads_to_review' folder, next to their ID the issue gets appended to the name.
+'''
+
 failed_beads_path = 'beads_to_review'
 output_counter = 1
 
@@ -64,9 +70,7 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
     Notes
     -----
     - View A images are used for length and color extraction, while view B images are used for width measurements.  
-    - If `merge` is enabled, all artifacts are placed on a single background; otherwise, they are saved separately.  
     - Missing contours or failed scale detection will log warnings and skip the affected images.  
-    - Dominant colors are only extracted from view A due to the hole in view B pearls. !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO: change this
     '''  
     processed_images = {}
     length_viewA = []
@@ -80,18 +84,17 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
         bead_id, full_bead_view =  parse_bead_id_and_view(parse_filename_from_path(path))
         bead_view = NO_HOLE_VIEW if "A" in full_bead_view else HOLE_VIEW
         
-        
         original_image = cv2.imread(path)
 
         if original_image is None:
             logger.warning(f"The needed image could not be opened: {path}, so the bead {bead_id} had to be skipped")
             continue
 
-
         ppm = calculate_ppm(original_image, scale_size, config)
 
         artifact_contour, inner_contour, clahe_bool = find_artifact_contour(original_image, bead_view, config) 
-
+        
+        # in case CLAHE is applied, save that bead since the output may not be clean
         if clahe_bool:
             output_image_path = os.path.join(failed_beads_path, f"{bead_id}_{full_bead_view}_SIMILAR_TO_BACKGROUND.png")
             cv2.imwrite(output_image_path, original_image)
@@ -101,8 +104,8 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
             cv2.imwrite(output_image_path, original_image)
             logger.info(f"I M P O R T A N T: The image of bead {bead_id} ({bead_view}) could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.")
             continue
-
         
+
         if ppm is None:
             output_image_path = os.path.join(failed_beads_path, f"{bead_id}_{full_bead_view}_INVALID_SCALE.png")
             cv2.imwrite(output_image_path, original_image)
@@ -110,6 +113,7 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
             object_width = 0.0
         else:
             object_width = get_horizontal_dimension(artifact_contour, ppm, config)
+
 
         if object_width != 0.0:
             if bead_view == NO_HOLE_VIEW:
