@@ -46,12 +46,6 @@ def config_context(path):
         if img is None:
             raise FileNotFoundError(f"The following path could not open an image: {path}")
    
-        # RESIZING PART 2!
-        #img = cv2.resize( img, (6000, 4000))
-        #img = cv2.resize( img, (6600, 4400))
-        #img = cv2.resize( img, (7000, 4667))
-        #img = cv2.resize( img, (7500, 5000))
-
         image_pixels = img.shape[0] * img.shape[1]
 
         if image_pixels > 35000000:

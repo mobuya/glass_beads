@@ -128,7 +128,7 @@ def find_artifact_contour(original_image, bead_view, configuration, thr_value = 
             return find_artifact_contour(original_image, bead_view,configuration, new_thr_value, NEW_HOLE_SIMILARITY_TOLERANCE) 
 
             
-    return smallest_contr, inner_contour
+    return smallest_contr, inner_contour, clahe
     
 '''
 def get_background_color(image):
