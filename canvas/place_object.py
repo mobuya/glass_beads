@@ -42,7 +42,11 @@ def place_obj_on_background(images, out_contours, in_contours, transparent, conf
         The combined image with all beads, or one, placed on the background.
 
     '''
-    #TODO: Error handling and logging
+
+    if not images or not out_contours or not in_contours:
+        logger.warning("Empty input lists detected. No object placement possible.")
+        return None
+
     if len(images) != len(out_contours):
         logger.warning("The number of images and outer contours dont match: no object placement possible.")
         return
