@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import os
 
 from utils import parse_filename_from_path, parse_bead_id_and_view
 from canvas import place_obj_on_background
@@ -9,6 +10,16 @@ import logging
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename='processing.log', encoding='utf-8', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s") # check the level
+
+failed_beads_path = 'beads_to_review'
+output_counter = 1
+
+output_path = failed_beads_path
+while os.path.exists(output_path):
+        logger.info(f"A folder with the name {output_path} already exists, created new one appending {output_counter} to folder name.")
+        output_path = failed_beads_path + f"_{output_counter}"
+        output_counter += 1
+os.makedirs(output_path) 
 
 
 def process_bead_data(paths, config, merge, transparent, scale_size):
@@ -75,22 +86,25 @@ def process_bead_data(paths, config, merge, transparent, scale_size):
             logger.warning(f"The needed image could not be opened: {path}, so the bead {bead_id} had to be skipped")
             continue
 
-        # RESIZING DONE HERE PT 1
-        #original_image = cv2.resize( original_image, (6000, 4000))
-        #original_image = cv2.resize( original_image, (6600, 4400))
-        #original_image = cv2.resize( original_image, (7000, 4667))
-        #original_image = cv2.resize( original_image, (7500, 5000))
 
         ppm = calculate_ppm(original_image, scale_size, config)
 
-        artifact_contour, inner_contour = find_artifact_contour(original_image, bead_view, config) 
+        artifact_contour, inner_contour, clahe_bool = find_artifact_contour(original_image, bead_view, config) 
+
+        if clahe_bool:
+            output_image_path = os.path.join(failed_beads_path, f"{bead_id}_{full_bead_view}_SIMILAR_TO_BACKGROUND.png")
+            cv2.imwrite(output_image_path, original_image)
     
         if artifact_contour is None:
+            output_image_path = os.path.join(failed_beads_path, f"{bead_id}_{full_bead_view}_NO_BEAD_CONTOUR.png")
+            cv2.imwrite(output_image_path, original_image)
             logger.info(f"I M P O R T A N T: The image of bead {bead_id} ({bead_view}) could NOT find a valid contour! PLEASE save this info and manually edit bead; further bead processing could not continue.")
             continue
 
         
         if ppm is None:
+            output_image_path = os.path.join(failed_beads_path, f"{bead_id}_{full_bead_view}_INVALID_SCALE.png")
+            cv2.imwrite(output_image_path, original_image)
             logger.info(f"For bead {bead_id}, view {bead_view} the ppm ratio could not be calculated; thus no valid size calculation.")
             object_width = 0.0
         else:

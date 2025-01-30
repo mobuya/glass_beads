@@ -104,16 +104,20 @@ for pearl_id, views in object_dictionary.items():
                 wA_str = f"{obj_len:.2f}".replace('.', ',')
                 wB_str = f"{obj_width:.2f}".replace('.', ',')
 
-                rgb_values, cell_fills = convert_for_xlsx(colors)
+                if len(colors) != 0:
+                    rgb_values, cell_fills = convert_for_xlsx(colors)
 
-                row = [pearl_id, wA_str, wB_str, ' ', rgb_values[0],' ',rgb_values[1],' ', rgb_values[2]]
-                sheet.append(row)
+                    row = [pearl_id, wA_str, wB_str, ' ', rgb_values[0],' ', rgb_values[1],' ', rgb_values[2]]
+                    sheet.append(row)
 
-                row_index = sheet.max_row
-                
-                sheet[f"D{row_index}"].fill = cell_fills[0]
-                sheet[f"F{row_index}"].fill = cell_fills[1]
-                sheet[f"H{row_index}"].fill = cell_fills[2]
+                    row_index = sheet.max_row
+                    
+                    sheet[f"D{row_index}"].fill = cell_fills[0]
+                    sheet[f"F{row_index}"].fill = cell_fills[1]
+                    sheet[f"H{row_index}"].fill = cell_fills[2]
+                else:
+                    row = [pearl_id, wA_str, wB_str, ' ', 'NO_COLOR']
+                    sheet.append(row)
 
                 logger.info(f"Finished processing bead: {pearl_id}.")
     except Exception as e:
